@@ -38,6 +38,16 @@ mp=MyPlot()
 
 #book_plots.plot_track([0, 11], [160, 172], label='Actual weight')
 data = g_h_filter(data=weights, x0=160., dx=1., g=6./10, h=2./3, dt=1.)
+############################################################################
+###second part
+from numpy.random import randn
+def gen_data(x0, dx, count, noise_factor):
+    return [x0 + dx*i + randn()*noise_factor for i in range(count)]
+
+#weights = gen_data(0, 1, 30, 1)
+weights = gen_data(x0=5., dx=2., count=100, noise_factor=10)
+#data = g_h_filter(data=weights, x0=0., dx=1., dt=1., g=.2, h=0.02)
+data = g_h_filter(data=weights, x0=100., dx=2., dt=1., g=0.2, h=0.02)
 #plot_g_h_results(weights, data)
 print(weights)
 print(data)
@@ -57,9 +67,9 @@ x,y=weight_np.T
 x_d,y_d=data_np.T
 x_s,y_s=state.T
 ax.scatter(x, y, color=f'{color_w}', s=point_size)
-ax.scatter(x_d, y_d, color=f'{color_d}', s=point_size)
+ax.scatter(x_d, y_d, color=f'{color_d}', s=5)
 ax.plot(x_d, y_d, color=f'{color_d}')
-ax.plot(x_s,y_s , color=f'yellow')
+#ax.plot(x_s,y_s , color=f'yellow')
 plt.grid()
 fig.show()
 print(weights[0])
