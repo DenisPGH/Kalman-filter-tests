@@ -12,8 +12,8 @@ def g_h_filter(data, x0, dx, g, h, dt=1.):
        'data' contains the data to be filtered.
        'x0' is the initial value for our state variable
        'dx' is the initial change rate for our state variable
-       'g' is the g-h's g scale factor
-       'h' is the g-h's h scale factor
+       'g' is the g-h's g scale factor- shoud be very small for better performance(not allaways)
+       'h' is the g-h's h scale factor- shoud be good chosed for best performace
        'dt' is the length of the time step
        """
     x_est = x0
@@ -47,7 +47,7 @@ def gen_data(x0, dx, count, noise_factor):
 #weights = gen_data(0, 1, 30, 1)
 weights = gen_data(x0=5., dx=2., count=100, noise_factor=10)
 #data = g_h_filter(data=weights, x0=0., dx=1., dt=1., g=.2, h=0.02)
-data = g_h_filter(data=weights, x0=100., dx=2., dt=1., g=0.2, h=0.02)
+data = g_h_filter(data=weights, x0=0., dx=2., dt=1., g=0.1, h=0.02)
 #plot_g_h_results(weights, data)
 print(weights)
 print(data)
