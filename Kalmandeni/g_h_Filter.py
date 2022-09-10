@@ -42,8 +42,10 @@ data = g_h_filter(data=weights, x0=160., dx=1., g=6./10, h=2./3, dt=1.)
 print(weights)
 print(data)
 #visual
+start_kg,end_kg=160,172
 weights=[[x,e] for x,e in enumerate(weights)]
 data=[[x,e] for x,e in enumerate(data)]
+state=np.array([[0,start_kg],[len(weights)-1,end_kg]])
 
 color_w='black'
 color_d='blue'
@@ -53,17 +55,11 @@ weight_np=np.array(weights)
 data_np=np.array(data)
 x,y=weight_np.T
 x_d,y_d=data_np.T
+x_s,y_s=state.T
 ax.scatter(x, y, color=f'{color_w}', s=point_size)
-
 ax.scatter(x_d, y_d, color=f'{color_d}', s=point_size)
 ax.plot(x_d, y_d, color=f'{color_d}')
-ax.plot([x_d[0],x_d[-1]], [y_d[0],y_d[-1]], color=f'yellow')
+ax.plot(x_s,y_s , color=f'yellow')
 plt.grid()
-#plt.plot(weights[0][1],weights[-1][1],'k')
 fig.show()
-# mp.show_this([weights[0],weights[-1]],'black')
-# mp.show_this([8,8],'black')
-# mp.show_this(weights,'blue')
-#
-# mp.end()
 print(weights[0])
