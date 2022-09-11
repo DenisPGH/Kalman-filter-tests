@@ -2,8 +2,11 @@ from filterpy.discrete_bayes import update
 import numpy as np
 from filterpy.discrete_bayes import predict
 
-from Descrete_Bayes_filter_2 import lh_hallway
+from Descrete_Bayes_filter_2 import lh_hallway, predict_move
 from matplotlib import pyplot as plt
+import kf_book.book_plots as book_plots
+from kf_book.book_plots import figsize, set_figsize
+from ipywidgets import interact, IntSlider
 
 
 def discrete_bayes_sim(prior, kernel, measurements, z_prob, hallway):
@@ -53,6 +56,8 @@ hallway = np.array([1, 1, 0, 0, 0, 0, 0, 0, 1, 0])
 
 # measurements with no noise
 zs = [hallway[i % len(hallway)] for i in range(50)]
+belief = [0., 0., 0., 1., 0., 0., 0., 0., 0., 0.]
+prior = predict_move(belief, 2, .1, .8, .1)
 
 priors, posteriors = discrete_bayes_sim(prior, kernel, zs, z_prob, hallway)
 interact(animate_discrete_bayes(hallway, priors, posteriors), step=IntSlider(value=1, max=len(zs)*2));
