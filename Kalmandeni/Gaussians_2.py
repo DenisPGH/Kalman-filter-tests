@@ -43,9 +43,15 @@ def gaussian_(x, mean, var, normed=True):
 
     return pdf
 
-
-
 plot_gaussian_pdf(22, 4, mean_line=True, xlabel='$^{\circ}C$')
 plt.show()
 
+
+######
+
+from filterpy.stats import norm_cdf
+print('Cumulative probability of range 21.5 to 22.5 is {:.2f}%'.format(
+      norm_cdf((21.5, 22.5), 22,4)*100))
+print('Cumulative probability of range 23.5 to 24.5 is {:.2f}%'.format(
+      norm_cdf((23.5, 24.5), 22,4)*100))
 
