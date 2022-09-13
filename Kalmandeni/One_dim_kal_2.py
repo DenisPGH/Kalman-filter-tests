@@ -194,12 +194,83 @@ x_f,y_f=filt.T
 
 
 #plot_measurements(zs)
-plt.scatter(x,y,color=f'blue', s=30)
+#plt.scatter(x,y,color=f'blue', s=30)
 #plt.scatter(x_f,y_f,color=f'red', s=30)
-plot_filter(xs[:, 0], var=priors[:, 1])
-plot_predictions(priors[:, 0])
+#plot_filter(xs[:, 0], var=priors[:, 1])
+#plot_predictions(priors[:, 0])
 # show_legend()
-plt.show()
+#plt.show()
 #kf_internal.print_variance(xs)
 #print(xs)
+
+#################################################################
+
+def update_primer(prior, measurement):
+    x, P = prior  # mean and variance of prior
+    z, R = measurement  # mean and variance of measurement
+
+    y = z - x  # residual
+    K = P / (P + R)  # Kalman gain
+
+    x = x + K * y  # posterior
+    P = (1 - K) * P  # posterior variance
+    return gaussian(x, P)
+
+
+def predict(posterior, movement):
+    x, P = posterior  # mean and variance of posterior
+    dx, Q = movement  # mean and variance of movement
+    x = x + dx
+    P = P + Q
+    return gaussian(x, P)
+
+"""
+                                KAlman Filter LOGIC
+Initialization
+
+1. Initialize the state of the filter
+2. Initialize our belief in the state
+
+Predict
+
+1. Use system behavior to predict state at the next time step
+2. Adjust belief to account for the uncertainty in prediction
+
+Update
+
+1. Get a measurement and associated belief about its accuracy
+2. Compute residual between estimated state and measurement
+3. Compute scaling factor based on whether the measurement
+or prediction is more accurate
+4. set state between the prediction and measurement based 
+on scaling factor
+5. update belief in the state based on how certain we are 
+in the measurement
+"""
+
+
+sensor_var = 300.**2
+process_var = 2.
+process_model = gaussian(1., process_var)
+pos = gaussian(0., 500.)
+N = 1000
+dog = DogSimulation(pos.mean, 1., sensor_var, process_var)
+zs = [dog.move_and_sense() for _ in range(N)]
+ps = []
+
+for i in range(N):
+    prior = predict(pos, process_model)
+    pos = update(prior, gaussian(zs[i][1], sensor_var))
+    ps.append(pos.mean)
+
+#book_plots.plot_measurements(zs, lw=1)
+
+plt.legend(loc=4)
+fig, ax = plt.subplots()
+zzs=np.array(zs)
+x,y=zzs.T
+plt.scatter(x,y,color=f'red', s=30)
+plot_filter(ps)
+
+plt.show()
 
