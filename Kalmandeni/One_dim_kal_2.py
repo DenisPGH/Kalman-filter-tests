@@ -152,7 +152,7 @@ zs = [dog.move_and_sense() for _ in range(10)]
 print(f'PREDICT\t\t\t                        UPDATE')
 print('     x      var\t\t  z\t    x      var')
 
-# perform Kalman filter on measurement z, only 5 lines
+# perform Kalman filter on measurement z, only 5 lines-Actual Fitler for one input varaiable
 for z in zs:
     prior = predict(x, process_model)
     likelihood = gaussian(z[1], sensor_var)
@@ -184,17 +184,21 @@ for i, z in enumerate(zs):
 
     xs[i] = x
 
-
+### visual
 
 fig, ax = plt.subplots()
 zzs=np.array(zs)
 x,y=zzs.T
+filt=np.array(xs)
+x_f,y_f=filt.T
+
 
 #plot_measurements(zs)
 plt.scatter(x,y,color=f'blue', s=30)
+#plt.scatter(x_f,y_f,color=f'red', s=30)
 plot_filter(xs[:, 0], var=priors[:, 1])
 plot_predictions(priors[:, 0])
-show_legend()
+# show_legend()
 plt.show()
 #kf_internal.print_variance(xs)
 #print(xs)
