@@ -217,7 +217,7 @@ def update_primer(prior, measurement):
     return gaussian(x, P)
 
 
-def predict(posterior, movement):
+def predict_primer(posterior, movement):
     x, P = posterior  # mean and variance of posterior
     dx, Q = movement  # mean and variance of movement
     x = x + dx
@@ -249,28 +249,98 @@ in the measurement
 """
 
 
-sensor_var = 300.**2
-process_var = 2.
+# sensor_var = 300.**2
+# process_var = 0.001  # 2.
+# process_model = gaussian(1., process_var)
+# pos = gaussian(0., 500.)
+# N = 1000
+# dog = DogSimulation(pos.mean, 1., sensor_var, process_var)
+# zs = [dog.move_and_sense() for _ in range(N)]
+# ps = []
+#
+# for i in range(N):
+#     prior = predict(pos, process_model)
+#     pos = update(prior, gaussian(zs[i][1], sensor_var))
+#     ps.append(pos.mean)
+
+#book_plots.plot_measurements(zs, lw=1)
+###################### test 2  Example: Extreme Amounts of Noise  ##############################################
+sensor_var = 20.
+process_var = .001
 process_model = gaussian(1., process_var)
 pos = gaussian(0., 500.)
-N = 1000
-dog = DogSimulation(pos.mean, 1., sensor_var, process_var)
+N = 100
+dog = DogSimulation(pos.mean, 1, sensor_var, process_var*10000)
+zs, ps = [], []
+for _ in range(N):
+    dog.velocity += 0.04
+    zs.append(dog.move_and_sense())
+
+for z in zs:
+    prior = predict(pos, process_model)
+    pos = update(prior, gaussian(z[1], sensor_var))
+    ps.append(pos.mean)
+
+###################### test 2 ##############################################
+###################### test 3 Example: Bad Initial Estimate  ##############################################
+sensor_var = 5.**2
+process_var = 2.
+pos = gaussian(1000., 500.)
+process_model = gaussian(1., process_var)
+N = 100
+dog = DogSimulation(0, 1, sensor_var, process_var)
 zs = [dog.move_and_sense() for _ in range(N)]
 ps = []
 
-for i in range(N):
+for z in zs:
     prior = predict(pos, process_model)
-    pos = update(prior, gaussian(zs[i][1], sensor_var))
+    pos = update(prior, gaussian(z[1], sensor_var))
+    ps.append(pos.mean)
+###################### test 3 ##############################################
+###################### test 4 Example: Large Noise and Bad Initial Estimate  ##############################################
+sensor_var = 30000.
+process_var = 2.
+pos = gaussian(1000., 500.)
+process_model = gaussian(1., process_var)
+
+N = 1000
+dog = DogSimulation(0, 1, sensor_var, process_var)
+zs = [dog.move_and_sense() for _ in range(N)]
+ps = []
+
+for z in zs:
+    prior = predict(pos, process_model)
+    pos = update(prior, gaussian(z[1], sensor_var))
     ps.append(pos.mean)
 
-#book_plots.plot_measurements(zs, lw=1)
+
+###################### test 4 ##############################################
+###################### test 5 ##############################################
+""" Finally, let's implement the suggestion of using the first measurement as the initial position."""
+sensor_var = 30000.
+process_var = 2
+process_model = gaussian(1., process_var)
+N = 1000
+dog = DogSimulation(0, 1, sensor_var, process_var)
+zs = [dog.move_and_sense() for _ in range(N)]
+
+pos = gaussian(zs[0][1], 500.)
+ps = []
+for z in zs:
+    prior = predict(pos, process_model)
+    pos = update(prior, gaussian(z[1], sensor_var))
+    ps.append(pos.mean)
+###################### test 5 ##############################################
+
+
+
 
 plt.legend(loc=4)
 fig, ax = plt.subplots()
 zzs=np.array(zs)
 x,y=zzs.T
-plt.scatter(x,y,color=f'red', s=30)
+plt.scatter(x,y,color=f'red', s=10)
 plot_filter(ps)
-
+plt.grid()
 plt.show()
 
