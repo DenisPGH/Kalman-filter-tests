@@ -116,6 +116,20 @@ B, u: Optionally, the control input and function
 
 ################ UPDATE STEP -- Design the Measurement Function #################################
 
+H = np.array([[1., 0.]])  # [position,velocity] # need only pos=1, not velocity=0
+
+################ UPDATE STEP -- Design the Measurement #################################
+""" z=[z].T one sensor,     z=[z1,z2,z3].T  poveche sensors"""
+
+R = np.array([[5.]]) #one sensor, if two R=[[5,0],[0,2]] diagonal
+
+######## test update ####################################
+
+from filterpy.kalman import update
+z = 1.
+x, P = update(x, P, z, R, H)
+print('x =', x)
+
 
 
 
