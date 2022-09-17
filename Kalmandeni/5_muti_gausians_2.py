@@ -171,7 +171,7 @@ cov = [[10., 0.],
 #plot_3d_covariance(mean, cov) # joint probability density function.
 
 #####################################################################
-from filterpy.stats import gaussian, multivariate_gaussian, plot_covariance_ellipse
+from filterpy.stats import gaussian, multivariate_gaussian, plot_covariance_ellipse, multivariate_multiply
 
 x = [2.5, 7.3] # probability density
 mu = [2.0, 7.0] # mean of our belief
@@ -190,11 +190,55 @@ from filterpy.stats import plot_covariance
 import matplotlib.pyplot as plt
 
 P = [[2, 0], [0, 6]]
-plot_covariance((2, 7), P, fc='g', alpha=0.2,
-                        std=[1, 2, 3],
-                        title='|2 0|\n|0 6|')
-#plt.gca().grid(b=False)
-plt.grid()
-plt.show()
+#plot_covariance((2, 7), P, fc='g', alpha=0.2,std=[1, 2, 3],title='|2 0|\n|0 6|')
+
+# plt.grid()
+# plt.show()
 
 ################################################################
+
+# max_temp = [200, 250, 300, 400, 450, 500]
+# lifespan = [10, 9.7, 5, 5.4, 4.3, 0.3]
+#
+# plt.scatter(max_temp, lifespan, s=80)
+# cov = np.cov(np.vstack((max_temp, lifespan)))
+# plot_covariance((np.mean(max_temp), np.mean(lifespan)), cov, fc='g',
+#             alpha=0.2, axis_equal=False, std=2)
+# plt.title('Engine Temperature vs Lifespan')
+# plt.xlabel('Temperature (C)'); plt.ylabel('Years')
+# plt.grid()
+# plt.show()
+
+################################################################################
+
+# P = [[4, 3.9], [3.9, 4]]
+#
+# plot_covariance((5, 10), P, ec='k', std=[1, 2, 3])
+# plt.xlabel('X')
+# plt.ylabel('Y')
+# plt.grid()
+# plt.show()
+
+############################### Multiplication MUltivariative #######################
+""" I have plotted the original estimate (prior) in a very transparent yellow, 
+the radar reading in green (evidence),
+ and the finale estimate (posterior) in blue."""
+from filterpy.stats import multivariate_multiply
+P0 = [[6, 0], [0, 6]] # prior
+P1 = [[2, 1.9], [1.9, 2]] # radar radar
+P2 = multivariate_multiply((10, 10), P0, (10, 10), P1)[1] # posterior in blue
+# plot_covariance_ellipse((10, 10), P0, ec='k', fc='y', alpha=0.2)
+# plot_covariance_ellipse((10, 10), P1, ec='k', fc='g', alpha=0.9)
+# plot_covariance_ellipse((10, 10), P2, ec='k', fc='b')
+# plt.grid()
+# plt.show()
+## with second radar####################################################
+""" The only likely place for the aircraft is where the two ellipses intersect. The intersection,
+ formed by multiplying the prior and measurement, is a new Gaussian. """
+P3 = [[2, -1.9], [-1.9, 2.2]] # with second radar
+P4 = multivariate_multiply((10, 10), P2, (10, 10), P3)[1] #result f
+plot_covariance_ellipse((10, 10), P2, ec='k', fc='y', alpha=0.6)
+plot_covariance_ellipse((10, 10), P3, ec='k', fc='g', alpha=0.6)
+plot_covariance_ellipse((10, 10), P4, ec='k', fc='b')
+plt.grid()
+plt.show()
