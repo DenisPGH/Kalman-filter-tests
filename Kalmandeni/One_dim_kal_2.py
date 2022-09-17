@@ -335,12 +335,12 @@ for z in zs:
 
 
 
-plt.legend(loc=4)
-fig, ax = plt.subplots()
-zzs=np.array(zs)
-x,y=zzs.T
-plt.scatter(x,y,color=f'red', s=10)
-plot_filter(ps)
-plt.grid()
-plt.show()
+# plt.legend(loc=4)
+# fig, ax = plt.subplots()
+# zzs=np.array(zs)
+# x,y=zzs.T
+# plt.scatter(x,y,color=f'red', s=10)
+# plot_filter(ps)
+# plt.grid()
+# plt.show()
 
