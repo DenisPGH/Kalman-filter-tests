@@ -46,6 +46,7 @@ kf = pos_vel_filter(x, P=500, R=5, Q=0.1, dt=dt)
 print(f"resultat {kf}")
 
 ### run code for use the Kalman filter ########################
+from filterpy.common import Saver
 def compute_dog_data(z_var, process_var, count=1, dt=1.):
     "returns track, measurements 1D ndarrays"
     x, vel = 0., 1.
@@ -124,14 +125,16 @@ def run(x0=(0.,0.), P=500, R=0, Q=0, dt=1.0,
 
     # create the Kalman filter
     kf = pos_vel_filter(x0, R=R, P=P, Q=Q, dt=dt)
-
+    s = Saver(kf)
     # run the kalman filter and store the results
-    xs, cov = [], []
+    xs, cov = [], [] # or can use Saver class
     for z in zs:
         kf.predict()
         kf.update(z)
         xs.append(kf.x)
         cov.append(kf.P)
+        s.save()
+    print(s.x)
 
     xs, cov = np.array(xs), np.array(cov)
     if do_plot:
@@ -144,3 +147,17 @@ def run(x0=(0.,0.), P=500, R=0, Q=0, dt=1.0,
 
 P = np.diag([500., 49.])
 Ms, Ps = run(count=50, R=10, Q=0.01, P=P)
+
+
+############# SAVER CLASS #################################
+""" the class can save the result for us  xs, cov = [], [] """
+
+# from filterpy.common import Saver
+# kf = pos_vel_filter([0, .1], R=R, P=P, Q=Q, dt=1.)
+# s = Saver(kf)
+# for i in range(1, 6):
+#     kf.predict()
+#     kf.update([i])
+#     s.save()  # save
+#
+# print(s.x)
