@@ -42,7 +42,7 @@ print(A @ x)
 
 
 ### Predict step- Design State Covariance ~ P #############################
-P = np.diag([500., 49.])   #vel=7**2 =49, estimated start position =500 sq.m
+P = np.diag([500., 49.])   #velositi=7**2 =49 , estimated start position =500 sq.m
 print(P)
 
 
@@ -95,6 +95,26 @@ plot_covariance_ellipse(x, P, edgecolor='k', ls='dashed')
 plt.show()
 
 ########### Prediction step - Design Process Noise ################################
+from filterpy.common import Q_discrete_white_noise
+Q = Q_discrete_white_noise(dim=2, dt=1., var=2.35) # white proccess noise dim=dim of matrix, dt=time step, var=variance
+print(Q)
+
+############# Prediction step - Design the Control Function #################################
+B = 0.  # my dog doesn't listen to me!
+u = 0
+x, P = predict(x, P, F, Q, B, u)
+print('x =', x)
+print('P =', P)
+"""
+Prediction: Summary
+Your job as a designer is to specify the matrices for
+
+x, P : the state and covariance
+F, Q : the process model and noise covariance
+B, u: Optionally, the control input and function
+"""
+
+################ UPDATE STEP -- Design the Measurement Function #################################
 
 
 
