@@ -7,7 +7,8 @@ from One_dim_kal_2 import plot_measurements, plot_filter
 import matplotlib.pyplot as plt
 
 from a6_1_Multivar_kalman_filter import compute_dog_data
-from a6_2_Multi_kalman_filter import pos_vel_filter
+from a6_2_Multi_kalman_filter import pos_vel_filter, run
+
 
 #### Implement Kalman filter without filterpy #########################################
 
@@ -151,8 +152,36 @@ def compare_1D_2D(x0, P, R, Q, vel, u=None):
     plt.figure()
     plot_1d_2d(xs, xs1, xs2)
 
-
+#################### tests different settings ##################################
 #compare_1D_2D(x0=0, P=50., R=5., Q=.02, vel=1.)
 
 #compare_1D_2D(x0=0, P=50., R=5., Q=.02, vel=1., u=1.)
-compare_1D_2D(x0=0, P=50., R=5., Q=.02, vel=-2., u=1.)
+#compare_1D_2D(x0=0, P=50., R=5., Q=.02, vel=-2., u=1.)
+
+################ Adjusting the Filter ##################################
+
+from numpy.random import seed
+seed(2)
+trk, zs = compute_dog_data(z_var=225, process_var=.02, count=50)
+
+# run(track=trk, zs=zs, R=225, Q=200, P=P, plot_P=False,
+#     title='R_var = 225 $m^2$, Q_var = 20 $m^2$') # big Q not trust the prediction
+# run(track=trk, zs=zs, R=225, Q=.02, P=P, plot_P=False,
+#     title='R_var = 225 $m^2$, Q_var = 0.02 $m^2$') # small Q we trust the prediction
+#
+#
+# run(track=trk, zs=zs, R=10000, Q=.2, P=P, plot_P=False,
+#     title='R=$10,000\, m^2$, Q=$.2\, m^2$') # very big R , measurment noise
+#
+var=27.5
+# run(track=trk, zs=zs, R=var, Q=.02, P=500., plot_P=True,
+#     title='$P=500\, m^2$') # with big P
+#
+# run(track=trk, zs=zs, R=var, Q=.02, P=1., plot_P=True,
+#     title='$P=1\, m^2$') # small P
+
+
+x = np.array([100., 0.])
+run(track=trk, zs=zs, R=var, Q=.02, P=1., x0=x,
+    plot_P=False, title='$P=1\, m^2$') # wrong estimate start pos(100,0), and it is (0,0), and small P
+
