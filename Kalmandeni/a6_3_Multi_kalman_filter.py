@@ -182,6 +182,6 @@ var=27.5
 
 
 x = np.array([100., 0.])
-run(track=trk, zs=zs, R=var, Q=.02, P=1., x0=x,
-    plot_P=False, title='$P=1\, m^2$') # wrong estimate start pos(100,0), and it is (0,0), and small P
+#run(track=trk, zs=zs, R=var, Q=.02, P=1., x0=x,
+    #plot_P=False, title='$P=1\, m^2$') # wrong estimate start pos(100,0), and it is (0,0), and small P
 
