@@ -149,23 +149,23 @@ dog = DogSimulation(
 
 # create list of measurements
 zs = [dog.move_and_sense() for _ in range(10)]
-print(f'PREDICT\t\t\t                        UPDATE')
-print('     x      var\t\t  z\t    x      var')
+#print(f'PREDICT\t\t\t                        UPDATE')
+#print('     x      var\t\t  z\t    x      var')
 
 # perform Kalman filter on measurement z, only 5 lines-Actual Fitler for one input varaiable
 for z in zs:
     prior = predict(x, process_model)
     likelihood = gaussian(z[1], sensor_var)
     x = update(prior, likelihood)
-    print(f"{prior},  {z[1]:.2f},    {x},")
+    #print(f"{prior},  {z[1]:.2f},    {x},")
 
 
-print(f'final estimate:        {x.mean:10.3f}')
-print(f'actual final position: {dog.x:10.3f}')
+#print(f'final estimate:        {x.mean:10.3f}')
+#print(f'actual final position: {dog.x:10.3f}')
 
 
 ########################################################
-print('NEW TEST   ###########################')
+#print('NEW TEST   ###########################')
 process_var = 2.
 sensor_var = 4.5
 x = gaussian(0., 400.)
@@ -180,7 +180,7 @@ for i, z in enumerate(zs):
     prior = predict(x, process_model)
     x = update(prior, gaussian(z[1], sensor_var))
     priors[i] = prior
-    print(f"{prior},  {x}")
+    #print(f"{prior},  {x}")
 
     xs[i] = x
 
