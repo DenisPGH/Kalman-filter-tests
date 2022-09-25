@@ -1,3 +1,4 @@
+import json
 import math
 from math import tan, sin, cos, sqrt, atan2
 from filterpy.kalman import MerweScaledSigmaPoints
@@ -7,7 +8,7 @@ import matplotlib.pyplot as plt
 from filterpy.kalman import UnscentedKalmanFilter as UKF
 from filterpy.stats import plot_covariance_ellipse
 
-def move(x, dt, u, wheelbase):
+def move_steering(x, dt, u, wheelbase):
     """
     this is for =>  state transition function f(x).
     imitate the moving of the robot
@@ -30,10 +31,46 @@ def move(x, dt, u, wheelbase):
 
         sinh, sinhb = sin(hdg), sin(hdg + beta)
         cosh, coshb = cos(hdg), cos(hdg + beta)
-        return x + np.array([-r*sinh + r*sinhb,
-                              r*cosh - r*coshb, beta])
+        return x + np.array([-r*sinh + r*sinhb, r*cosh - r*coshb, beta])
     else: # moving in straight line
         return x + np.array([dist*cos(hdg), dist*sin(hdg), 0])
+
+
+
+
+def move(x, dt, u, wheelbase):
+    """
+    this is for =>  state transition function f(x).
+    imitate the moving of the robot
+    :param x: position [x,y,Theta]
+    :param dt: time interval
+    :param u: control motion  u=[velcity,alpha].T
+    :param wheelbase: how wide is the robot base
+    :return: robot goes ahead or turning
+    """
+
+    hdg = x[2] # theta
+    vel = u[0]
+    steering_angle = u[1]
+    dist = vel * dt
+
+    if abs(steering_angle) > 0.001: # is robot turning?
+        #beta = (dist / wheelbase) * tan(steering_angle)
+        beta = steering_angle
+        r = wheelbase / tan(steering_angle) # radius
+
+
+        sinh, sinhb = sin(hdg), sin(hdg )
+        cosh, coshb = cos(hdg), cos(hdg)
+        #return x + np.array([-r*sinh + r*sinhb, r*cosh - r*coshb, beta])
+        #return x + np.array([dist * cos(hdg), dist * sin(hdg), hdg])
+        return x + np.array([dist * cos(steering_angle), dist * sin(steering_angle), hdg-steering_angle])
+
+    else: # moving in straight line
+        #print(x + np.array([dist*cos(hdg), dist*sin(hdg), 0]))
+        return x + np.array([dist*cos(hdg), dist*sin(hdg), 0])
+
+
 
 def normalize_angle(x):
     """
@@ -149,12 +186,13 @@ def run_localization(
 
     # plot landmarks
     if len(landmarks) > 0:
-        plt.scatter(landmarks[:, 0], landmarks[:, 1],
-                    marker='s', s=60)
+        #plt.scatter(landmarks[:, 0], landmarks[:, 1], marker='s', s=60)
+        plt.scatter(landmarks[:, 0], landmarks[:, 1], s=30)
 
     track = []
     for i, u in enumerate(cmds):
         sim_pos = move(sim_pos, dt / step, u, wheelbase)
+        #print(sim_pos)
         track.append(sim_pos)
 
         if i % step == 0:
@@ -191,6 +229,19 @@ def run_localization(
 
 
 ############### run the code for the moving ##########################
+# with open("js.json",'r') as jso:
+#     points=json.load(jso)
+#
+#     print(type(points))
+#     print(len(points))
+#     print(points['1']['node_points'][0])
+# landmarks = np.array([[5, 10], [10, 5], [15, 15], [20, 5],
+#                       [0, 30], [50, 30], [40, 10]])
+#
+# landmarks=[l['node_points'] for l in points.values()]
+# print(landmarks[0])
+# landmarks=np.array(landmarks[0])
+
 landmarks = np.array([[5, 10], [10, 5], [15, 15], [20, 5],
                       [0, 30], [50, 30], [40, 10]])
 dt = 0.1
@@ -239,10 +290,11 @@ def turn(v, t0, t1, steps):
 # cmds.extend(turn(v, 0, 1, 25))
 # cmds.extend([cmds[-1]] * 100)
 # ################ run the code #################
-velocity=10 #cm/sec
-angle_degrees=0
+velocity=5 #cm/sec
+angle_degrees=45
 angle_radians=math.radians(angle_degrees)
-cmds= [[velocity,angle_radians] for x in range(10)]
+cmds= [[velocity,angle_radians] for x in range(30)]
+
 ukf = run_localization(
     cmds, landmarks, sigma_vel=0.1, sigma_steer=np.radians(1),
     sigma_range=0.3, sigma_bearing=0.1, step=1,
