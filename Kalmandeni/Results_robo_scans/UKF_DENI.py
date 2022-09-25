@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from filterpy.kalman import UnscentedKalmanFilter as UKF
 from filterpy.stats import plot_covariance_ellipse
 
-from Results_robo_scans.transofmation_vector_ukf import DeniTransformation
+
 
 
 def move_steering(x, dt, u, wheelbase):
@@ -43,6 +43,7 @@ def move_steering(x, dt, u, wheelbase):
 
 def move(x, dt, u, wheelbase):
     """
+    move rotation my car
     this is for =>  state transition function f(x).
     imitate the moving of the robot
     :param x: position [x,y,Theta]
@@ -226,13 +227,7 @@ def run_localization(
     plt.axis('equal')
     plt.title("UKF Robot localization")
     ###### show orientation robot ############
-    DT = DeniTransformation()
-    smile = [[0, 0], [0, 0.5], [0, 1], [0.5, 0], [1, 0], [-0.5, 0], [-1, 0]]
-    data = np.array(smile)
-    new_places_ = DT.translocation(data+1, ukf.x[0], ukf.x[1], ukf.x[2])
-    data_transf = np.array(new_places_)
-    x_t, y_t = data_transf.T
-    plt.scatter(x_t, y_t, color=f'red', s=10)
+    plt.plot(ukf.x[0], ukf.x[1], marker=(5, 0, math.degrees(ukf.x[2])), markersize=10, linestyle='None',color='red')
 
     plt.grid()
     plt.show()
