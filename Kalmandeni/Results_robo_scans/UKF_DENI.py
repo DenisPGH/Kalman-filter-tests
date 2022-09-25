@@ -1,5 +1,6 @@
 import json
 import math
+import time
 from math import tan, sin, cos, sqrt, atan2
 from filterpy.kalman import MerweScaledSigmaPoints
 from numpy.random import randn
@@ -190,7 +191,7 @@ def run_localization(
               z_mean_fn=z_mean, residual_x=residual_x,
               residual_z=residual_h)
 
-    ukf.x = np.array([0, 0, 0]) # [2, 6, .3] # here is the start position and orientation
+    ukf.x = np.array([70, 70, math.radians(45)]) # [2, 6, .3] # here is the start position and orientation
     ukf.P = np.diag([.1, .1, .05])
     ukf.R = np.diag([sigma_range ** 2,
                      sigma_bearing ** 2] * len(landmarks))
@@ -201,7 +202,7 @@ def run_localization(
     # plot landmarks
     if len(landmarks) > 0:
         #plt.scatter(landmarks[:, 0], landmarks[:, 1], marker='s', s=60)
-        plt.scatter(landmarks[:, 0], landmarks[:, 1], s=30)
+        plt.scatter(landmarks[:, 1], landmarks[:, 0], s=30)
 
     track = []
     for i, u in enumerate(cmds):
@@ -214,15 +215,15 @@ def run_localization(
 
             if i % ellipse_step == 0:
                 plot_covariance_ellipse(
-                    (ukf.x[0], ukf.x[1]), ukf.P[0:2, 0:2], std=6,
+                    (ukf.x[1], ukf.x[0]), ukf.P[0:2, 0:2], std=6,
                     facecolor='k', alpha=0.3)
 
-            x, y = sim_pos[0], sim_pos[1]
+            x, y = sim_pos[1], sim_pos[0]
             z = []
             for lmark in landmarks:
-                dx, dy = lmark[0] - x, lmark[1] - y
+                dx, dy = lmark[1] - x, lmark[0] - y
                 d = sqrt(dx ** 2 + dy ** 2) + randn() * sigma_range
-                bearing = atan2(lmark[1] - y, lmark[0] - x)
+                bearing = atan2(lmark[0] - y, lmark[1] - x)
                 a = (normalize_angle(bearing - sim_pos[2] +
                                      randn() * sigma_bearing))
                 z.extend([d, a])
@@ -230,18 +231,14 @@ def run_localization(
             #print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta: {math.degrees(ukf.x[2])}")
             if i % ellipse_step == 0:
                 plot_covariance_ellipse(
-                    (ukf.x[0], ukf.x[1]), ukf.P[0:2, 0:2], std=6,
+                    (ukf.x[1], ukf.x[0]), ukf.P[0:2, 0:2], std=6,
                     facecolor='g', alpha=0.8)
 
 
     track = np.array(track)
-    plt.plot(track[:, 0], track[:, 1], color='k', lw=2)
+    plt.plot(track[:, 1], track[:, 0], color='k', lw=2)
     plt.axis('equal')
     plt.title("UKF Robot localization")
-    ###### show orientation robot ############
-    #plt.plot(ukf.x[0], ukf.x[1], marker=(5, 0, math.degrees(ukf.x[2])), markersize=20, linestyle='None',color='red')
-    #plt.plot(ukf.x[0], ukf.x[1],color='blue',lw=20)
-    #print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta: {math.degrees(ukf.x[2])}")
     plt.grid()
     plt.show()
 
@@ -249,13 +246,19 @@ def run_localization(
 
 
 ############### run the code for the moving ##########################
-# with open("js.json",'r') as jso:
-#     points=json.load(jso)
-# landmarks=[l['node_points'] for l in points.values()]
-# landmarks=np.array([[y,x] for x,y in landmarks[0]])
-# #landmarks=np.array(landmarks[0])
+with open("js.json",'r') as jso:
+    points=json.load(jso)
+landmarks=[l['node_points'] for l in points.values()]
+lm=[]
+for step in landmarks[:1]:
+    lm.extend([[y,x] for x,y in step])
 
-landmarks = np.array([[5, 10], [10, 5], [15, 15], [20, 5], [0, 30], [50, 30], [40, 10]])
+#landmarks=np.array([[y,x] for x,y in landmarks])
+landmarks=np.array(lm)
+
+#landmarks=np.array(landmarks[0])
+
+#landmarks = np.array([[5, 10], [10, 5], [15, 15], [20, 5], [0, 30], [50, 30], [40, 10], [-44.35, 344.15], [-36.53, 343.06], [-28.87, 341.78], [-21.5, 342.33], [-13.85, 340.72], [-6.29, 338.94], [1.11, 340.0], [8.62, 339.89], [15.99, 340.62], [23.62, 343.19], [31.28, 344.58], [39.13, 346.8], [46.82, 346.85], [41.42, 225.22], [135.04, 344.48], [144.16, 345.1], [153.28, 345.53], [240.48, 340.67], [267.5, 315.98], [273.08, 308.5], [268.98, 278.24], [269.45, 266.53], [270.19, 255.7], [270.45, 245.12], [271.26, 235.16], [270.29, 223.93], [269.63, 213.63], [271.14, 205.14], [270.75, 195.58], [268.31, 185.16], [269.78, 177.61], [130.64, 65.18], [125.17, 55.69], [125.43, 52.56], [114.61, 41.82], [142.8, 38.89], [143.58, 35.88], [143.37, 32.48], [143.1, 28.95], [142.71, 25.65], [143.23, 22.6], [142.71, 19.26], [143.09, 16.15], [143.41, 13.06], [143.66, 9.89], [143.85, 6.67], [142.96, 3.47], [143.0, 0.31], [142.97, -2.73], [142.88, -5.77], [142.72, -9.0], [143.19, -15.25]])
 dt = 1
 wheelbase = 0.5
 sigma_range = 0.3
@@ -276,69 +279,43 @@ def turn(v, t0, t1, steps):
 
 def pi_to_pi(x):
     # x in radians
+    """
+    convert -180,180 to 0-360
+
+    :param x: angle in radians
+    :return:
+    """
     x=x%360
     return x
 
 
 
 
-# accelerate from a stop
-#cmds = [[v, .0] for v in np.linspace(0.001, 5, 3)] #(,velosity,)
-# cmds.extend([cmds[-1]] * 50)
-#print(cmds)
 
-# turn left
-# v = cmds[-1][0]
-# print(v) # velocity
-# v=5
-# cmds=[]
-# cmds.extend(turn(v, 0, 5, 60))
-# cmds.extend([cmds[-1]] * 3)
-# for a in cmds:
-#     print(a)  # a[0]= velociti   , a[1] =
-#
-# # turn right
-# cmds.extend(turn(v, 2, -2, 15))
-# cmds.extend([cmds[-1]] * 200)
-#
-# cmds.extend(turn(v, -2, 0, 15))
-# cmds.extend([cmds[-1]] * 150)
-#
-# cmds.extend(turn(v, 0, 1, 25))
-# cmds.extend([cmds[-1]] * 100)
-# ################ run the code #################
 
 dist=100
 
-ang=315
-# if not 0<=ang<=180:
-#     velocity=dist
-#     angle_degrees=ang
-# else:
+ang=45
+
 velocity=1 #cm/sec ili dist
 angle_degrees=ang
 angle_radians=math.radians(angle_degrees)
-cmds= [[velocity,angle_radians] if x<15  else [velocity,angle_radians] for x in range(dist) ]
+#cmds= [[velocity,angle_radians] if x<15  else [velocity,angle_radians] for x in range(dist) ]
+cmds=[[velocity,angle_radians]]*dist
 
-
+start=time.time()
 ukf = run_localization(
     cmds, landmarks, sigma_vel=0.1, sigma_steer=np.radians(1),
     sigma_range=0.3, sigma_bearing=0.1, step=1,
     ellipse_step=10)
-#print('final covariance', ukf.P.diagonal())
-#orientir=math.degrees(ukf.x[2])
-orientir=pi_to_pi(math.degrees(ukf.x[2]))
 
+orientir=pi_to_pi(math.degrees(ukf.x[2]))
 
 print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta_-pi: {math.degrees(ukf.x[2])}")
 print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta_2pi: {orientir}")
 
-### show car orientation
-# plt.plot(ukf.x[0], ukf.x[1], marker=(5, 0, math.degrees(ukf.x[2])), markersize=20, linestyle='None',color='red')
-# plt.show()
+print(f"Time: {time.time()-start}")
 
-a=normalize_angle(angle_radians)
-print(math.degrees(a))
 
 
 
