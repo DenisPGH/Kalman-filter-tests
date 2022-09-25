@@ -6,7 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 from filterpy.kalman import UnscentedKalmanFilter as UKF
-import matplotlib; matplotlib.use("TkAgg")
+from filterpy.stats import plot_covariance_ellipse
+#import matplotlib; matplotlib.use("TkAgg")
 
 
 def move(x, dt, u, wheelbase):
@@ -121,7 +122,7 @@ def z_mean(sigmas, Wm):
 
 
 #################### Implementation ###########################################
-from filterpy.stats import plot_covariance_ellipse
+
 
 dt = 1.0
 wheelbase = 0.5
@@ -178,12 +179,16 @@ def run_localization(
                 plot_covariance_ellipse(
                     (ukf.x[0], ukf.x[1]), ukf.P[0:2, 0:2], std=6,
                     facecolor='g', alpha=0.8)
-            track = np.array(track)
-            plt.plot(track[:, 0], track[:, 1], color='k', lw=2)
-            plt.axis('equal')
-            plt.title("UKF Robot localization")
-            plt.show()
-            return ukf
+
+    track = np.array(track)
+    plt.plot(track[:, 0], track[:, 1], color='k', lw=2)
+    plt.axis('equal')
+    plt.title("UKF Robot localization")
+    plt.grid()
+    plt.show()
+    #print(track[:, 0], track[:, 1])
+    return ukf
+
 
 
 
@@ -191,11 +196,12 @@ def run_localization(
 
 ############### run the code for the moving ##########################
 
-landmarks = np.array([[5, 10], [10, 5], [15, 15]])
-cmds = [np.array([1.1, .01])] * 200
-ukf = run_localization(
-    cmds, landmarks, sigma_vel=0.1, sigma_steer=np.radians(1),
-    sigma_range=0.3, sigma_bearing=0.1)
-print('Final P:', ukf.P.diagonal())
-plt.show()
+# landmarks = np.array([[5, 10], [10, 5], [15, 15]])
+# landmarks = np.array([[5, 10], [10, 5], [15, 15],[4,5],[5,5]])
+# cmds = [np.array([1.1, .1])] * 200
+# ukf = run_localization(
+#     cmds, landmarks, sigma_vel=0.1, sigma_steer=np.radians(1),
+#     sigma_range=0.3, sigma_bearing=0.1)
+# print('Final P:', ukf.P.diagonal())
+# plt.show()
 
