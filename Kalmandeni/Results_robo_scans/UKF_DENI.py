@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 from filterpy.kalman import UnscentedKalmanFilter as UKF
 from filterpy.stats import plot_covariance_ellipse
 
+from Results_robo_scans.transofmation_vector_ukf import DeniTransformation
+
+
 def move_steering(x, dt, u, wheelbase):
     """
     this is for =>  state transition function f(x).
@@ -219,31 +222,31 @@ def run_localization(
                     facecolor='g', alpha=0.8)
 
     track = np.array(track)
-    plt.plot(track[:, 0], track[:, 1], color='k', lw=2)
+    plt.plot(track[:, 1], track[:, 0], color='k', lw=2)
     plt.axis('equal')
     plt.title("UKF Robot localization")
+    ###### show orientation robot ############
+    DT = DeniTransformation()
+    smile = [[0, 0], [0, 0.5], [0, 1], [0.5, 0], [1, 0], [-0.5, 0], [-1, 0]]
+    data = np.array(smile)
+    new_places_ = DT.translocation(data+1, ukf.x[0], ukf.x[1], ukf.x[2])
+    data_transf = np.array(new_places_)
+    x_t, y_t = data_transf.T
+    plt.scatter(x_t, y_t, color=f'red', s=10)
+
     plt.grid()
     plt.show()
-    #print(track[:, 0], track[:, 1])
+
     return ukf
 
 
 ############### run the code for the moving ##########################
-# with open("js.json",'r') as jso:
-#     points=json.load(jso)
-#
-#     print(type(points))
-#     print(len(points))
-#     print(points['1']['node_points'][0])
-# landmarks = np.array([[5, 10], [10, 5], [15, 15], [20, 5],
-#                       [0, 30], [50, 30], [40, 10]])
-#
-# landmarks=[l['node_points'] for l in points.values()]
-# print(landmarks[0])
-# landmarks=np.array(landmarks[0])
+with open("js.json",'r') as jso:
+    points=json.load(jso)
+landmarks=[l['node_points'] for l in points.values()]
+landmarks=np.array(landmarks[0])
 
-landmarks = np.array([[5, 10], [10, 5], [15, 15], [20, 5],
-                      [0, 30], [50, 30], [40, 10]])
+#landmarks = np.array([[5, 10], [10, 5], [15, 15], [20, 5], [0, 30], [50, 30], [40, 10]])
 dt = 0.1
 wheelbase = 0.5
 sigma_range = 0.3
@@ -290,10 +293,19 @@ def turn(v, t0, t1, steps):
 # cmds.extend(turn(v, 0, 1, 25))
 # cmds.extend([cmds[-1]] * 100)
 # ################ run the code #################
-velocity=5 #cm/sec
-angle_degrees=45
+
+dist=10
+ang=45
+# if not 0<=ang<=180:
+#     velocity=dist
+#     angle_degrees=ang
+# else:
+velocity=dist #cm/sec ili dist
+angle_degrees=ang
 angle_radians=math.radians(angle_degrees)
-cmds= [[velocity,angle_radians] for x in range(30)]
+ang_turn_left=math.radians(90)
+cmds= [[velocity,angle_radians] if x<15  else [velocity,angle_radians] for x in range(30) ]
+
 
 ukf = run_localization(
     cmds, landmarks, sigma_vel=0.1, sigma_steer=np.radians(1),
@@ -301,6 +313,10 @@ ukf = run_localization(
     ellipse_step=20)
 #print('final covariance', ukf.P.diagonal())
 print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta: {math.degrees(ukf.x[2])}")
+
+### show car orientation
+
+
 
 
 
