@@ -68,12 +68,22 @@ def move(x, dt, u, wheelbase):
         cosh, coshb = cos(hdg), cos(hdg)
         #return x + np.array([-r*sinh + r*sinhb, r*cosh - r*coshb, beta])
         #return x + np.array([dist * cos(hdg), dist * sin(hdg), hdg])
-        return x + np.array([dist * cos(steering_angle), dist * sin(steering_angle), hdg-steering_angle])
+        return x + np.array([dist * cos(steering_angle), dist * sin(steering_angle), steering_angle-hdg])
 
     else: # moving in straight line
         #print(x + np.array([dist*cos(hdg), dist*sin(hdg), 0]))
         return x + np.array([dist*cos(hdg), dist*sin(hdg), 0])
 
+
+
+def normalize_angle_steering(x):
+    """
+    x: shoud be in radians
+    this funktion handle the different 360-1 degre"""
+    x = x % (2 * np.pi)    # force in range [0, 2 pi)
+    if x > np.pi:          # move to [-pi, pi)
+        x -= 2 * np.pi
+    return x
 
 
 def normalize_angle(x):
@@ -195,7 +205,7 @@ def run_localization(
 
     track = []
     for i, u in enumerate(cmds):
-        sim_pos = move(sim_pos, dt / step, u, wheelbase)
+        sim_pos = move(sim_pos, dt, u, wheelbase)
         #print(sim_pos)
         track.append(sim_pos)
 
@@ -217,18 +227,21 @@ def run_localization(
                                      randn() * sigma_bearing))
                 z.extend([d, a])
             ukf.update(z, landmarks=landmarks)
+            #print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta: {math.degrees(ukf.x[2])}")
             if i % ellipse_step == 0:
                 plot_covariance_ellipse(
                     (ukf.x[0], ukf.x[1]), ukf.P[0:2, 0:2], std=6,
                     facecolor='g', alpha=0.8)
 
+
     track = np.array(track)
-    plt.plot(track[:, 1], track[:, 0], color='k', lw=2)
+    plt.plot(track[:, 0], track[:, 1], color='k', lw=2)
     plt.axis('equal')
     plt.title("UKF Robot localization")
     ###### show orientation robot ############
-    plt.plot(ukf.x[0], ukf.x[1], marker=(5, 0, math.degrees(ukf.x[2])), markersize=10, linestyle='None',color='red')
-
+    #plt.plot(ukf.x[0], ukf.x[1], marker=(5, 0, math.degrees(ukf.x[2])), markersize=20, linestyle='None',color='red')
+    #plt.plot(ukf.x[0], ukf.x[1],color='blue',lw=20)
+    #print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta: {math.degrees(ukf.x[2])}")
     plt.grid()
     plt.show()
 
@@ -236,13 +249,14 @@ def run_localization(
 
 
 ############### run the code for the moving ##########################
-with open("js.json",'r') as jso:
-    points=json.load(jso)
-landmarks=[l['node_points'] for l in points.values()]
-landmarks=np.array(landmarks[0])
+# with open("js.json",'r') as jso:
+#     points=json.load(jso)
+# landmarks=[l['node_points'] for l in points.values()]
+# landmarks=np.array([[y,x] for x,y in landmarks[0]])
+# #landmarks=np.array(landmarks[0])
 
-#landmarks = np.array([[5, 10], [10, 5], [15, 15], [20, 5], [0, 30], [50, 30], [40, 10]])
-dt = 0.1
+landmarks = np.array([[5, 10], [10, 5], [15, 15], [20, 5], [0, 30], [50, 30], [40, 10]])
+dt = 1
 wheelbase = 0.5
 sigma_range = 0.3
 sigma_bearing = 0.1
@@ -259,6 +273,11 @@ def turn(v, t0, t1, steps):
 
     return [[v, a] for a in np.linspace(
         np.radians(t0), np.radians(t1), steps)]
+
+def pi_to_pi(x):
+    # x in radians
+    x=x%360
+    return x
 
 
 
@@ -289,28 +308,37 @@ def turn(v, t0, t1, steps):
 # cmds.extend([cmds[-1]] * 100)
 # ################ run the code #################
 
-dist=10
-ang=45
+dist=100
+
+ang=315
 # if not 0<=ang<=180:
 #     velocity=dist
 #     angle_degrees=ang
 # else:
-velocity=dist #cm/sec ili dist
+velocity=1 #cm/sec ili dist
 angle_degrees=ang
 angle_radians=math.radians(angle_degrees)
-ang_turn_left=math.radians(90)
-cmds= [[velocity,angle_radians] if x<15  else [velocity,angle_radians] for x in range(30) ]
+cmds= [[velocity,angle_radians] if x<15  else [velocity,angle_radians] for x in range(dist) ]
 
 
 ukf = run_localization(
     cmds, landmarks, sigma_vel=0.1, sigma_steer=np.radians(1),
     sigma_range=0.3, sigma_bearing=0.1, step=1,
-    ellipse_step=20)
+    ellipse_step=10)
 #print('final covariance', ukf.P.diagonal())
-print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta: {math.degrees(ukf.x[2])}")
+#orientir=math.degrees(ukf.x[2])
+orientir=pi_to_pi(math.degrees(ukf.x[2]))
+
+
+print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta_-pi: {math.degrees(ukf.x[2])}")
+print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta_2pi: {orientir}")
 
 ### show car orientation
+# plt.plot(ukf.x[0], ukf.x[1], marker=(5, 0, math.degrees(ukf.x[2])), markersize=20, linestyle='None',color='red')
+# plt.show()
 
+a=normalize_angle(angle_radians)
+print(math.degrees(a))
 
 
 
