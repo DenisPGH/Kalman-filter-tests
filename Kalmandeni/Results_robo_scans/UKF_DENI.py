@@ -114,12 +114,23 @@ def z_mean(sigmas, Wm):
 
 #################### Implementation ###########################################
 
-# dt = 1.0
-# wheelbase = 0.5
+
 
 def run_localization(
         cmds, landmarks, sigma_vel, sigma_steer, sigma_range,
         sigma_bearing, ellipse_step=1, step=10):
+    """
+
+    :param cmds: [velocity(cm/sec), angle turning (in radians)]
+    :param landmarks: [[x,y],[x,y]]
+    :param sigma_vel:
+    :param sigma_steer:
+    :param sigma_range:
+    :param sigma_bearing:
+    :param ellipse_step:
+    :param step:
+    :return:
+    """
     plt.figure()
     points = MerweScaledSigmaPoints(n=3, alpha=.00001, beta=2, kappa=0,
                                     subtract=residual_x)
@@ -188,6 +199,15 @@ sigma_range = 0.3
 sigma_bearing = 0.1
 
 def turn(v, t0, t1, steps):
+    """
+
+    :param v: velocity
+    :param t0:
+    :param t1:
+    :param steps:
+    :return:
+    """
+
     return [[v, a] for a in np.linspace(
         np.radians(t0), np.radians(t1), steps)]
 
@@ -195,15 +215,19 @@ def turn(v, t0, t1, steps):
 
 
 # accelerate from a stop
-cmds = [[v, .0] for v in np.linspace(0.001, 1, 300)] #(,velosity,)
+#cmds = [[v, .0] for v in np.linspace(0.001, 5, 3)] #(,velosity,)
 # cmds.extend([cmds[-1]] * 50)
 #print(cmds)
 
 # turn left
-v = cmds[-1][0]
-print(v)
-cmds.extend(turn(v, 0, 2, 15))
-cmds.extend([cmds[-1]] * 100)
+# v = cmds[-1][0]
+# print(v) # velocity
+# v=5
+# cmds=[]
+# cmds.extend(turn(v, 0, 5, 60))
+# cmds.extend([cmds[-1]] * 3)
+# for a in cmds:
+#     print(a)  # a[0]= velociti   , a[1] =
 #
 # # turn right
 # cmds.extend(turn(v, 2, -2, 15))
@@ -215,7 +239,10 @@ cmds.extend([cmds[-1]] * 100)
 # cmds.extend(turn(v, 0, 1, 25))
 # cmds.extend([cmds[-1]] * 100)
 # ################ run the code #################
-
+velocity=10 #cm/sec
+angle_degrees=0
+angle_radians=math.radians(angle_degrees)
+cmds= [[velocity,angle_radians] for x in range(10)]
 ukf = run_localization(
     cmds, landmarks, sigma_vel=0.1, sigma_steer=np.radians(1),
     sigma_range=0.3, sigma_bearing=0.1, step=1,
