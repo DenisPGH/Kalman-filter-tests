@@ -13,7 +13,7 @@ from filterpy.stats import plot_covariance_ellipse
 class UKFDeni:
     def __init__(self):
         self.dt=1
-        self.wheelbase=0.5
+        self.wheelbase=0.18
         self.end_x=0
         self.end_y=0
         self.end_theta=0
@@ -208,10 +208,10 @@ class UKFDeni:
                   residual_z=self.residual_h)
 
         ukf.x = np.array([start_x, start_y, math.radians(start_theta)])  # [2, 6, .3] # here is the start position and orientation
-        ukf.P = np.diag([.1, .1, .05])
+        ukf.P = np.diag([30, 30, 1.6])
         ukf.R = np.diag([sigma_range ** 2,
                          sigma_bearing ** 2] * len(landmarks))
-        ukf.Q = np.eye(3) * 0.0001
+        ukf.Q = np.eye(3) * 0.01 # 0.0001
 
         sim_pos = ukf.x.copy()
         #################
@@ -246,7 +246,7 @@ class UKFDeni:
         self.end_x=ukf.x[0]
         self.end_y=ukf.x[1]
         self.end_theta=self.pi_to_pi(math.degrees(ukf.x[2]))
-        self.start_x = ukf.x[0]
-        self.start_y = ukf.x[1]
-        self.start_theta = self.pi_to_pi(math.degrees(ukf.x[2]))
+        self.start_x = self.end_x
+        self.start_y = self.end_y
+        self.start_theta = self.end_theta
         return self.end_x, self.end_y, self.end_theta
