@@ -33,7 +33,7 @@ for step in all_p[:1]:
     lm.extend([[y,x] for x,y in step[20:30]])
 all_points=np.array(lm)
 
-mmm=all_points.mean()
+mmm=all_points.var()
 print(mmm)
 all_points=np.array([[0,0],[1,1],])
 
