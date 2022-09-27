@@ -82,14 +82,14 @@ data=np.array(smile)
 DT=DeniTransformation()
 new_places_=DT.translocation(data,to_x,to_y,ang)
 data_transf=np.array(new_places_)
-# x,y=data.T
-# x_t,y_t=data_transf.T
-# x_w,y_w=world_frame.T
-# fig, ax = plt.subplots()
-# ax.scatter(x, y, color=f'{color}', s=point_size)
-# ax.scatter(x_t, y_t, color=f'red', s=point_size)
-# ax.scatter(0, 0, color='black', s=point_size)
-# ax.scatter(x_w, y_w, color='black', s=point_size)
-# #ax.annotate('transpose', (x_t, y_t),fontsize=10,color='red')
-# plt.grid()
-# fig.show()
+x,y=data.T
+x_t,y_t=data_transf.T
+x_w,y_w=world_frame.T
+fig, ax = plt.subplots()
+ax.scatter(x, y, color=f'{color}', s=point_size)
+ax.scatter(x_t, y_t, color=f'red', s=point_size)
+ax.scatter(0, 0, color='black', s=point_size)
+ax.scatter(x_w, y_w, color='black', s=point_size)
+#ax.annotate('transpose', (x_t, y_t),fontsize=10,color='red')
+plt.grid()
+fig.show()
