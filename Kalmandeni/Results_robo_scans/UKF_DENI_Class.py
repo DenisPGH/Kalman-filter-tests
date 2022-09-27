@@ -17,6 +17,11 @@ class UKFDeni:
         self.end_x=0
         self.end_y=0
         self.end_theta=0
+        self.start_x = 0
+        self.start_y = 0
+        self.start_theta = 0
+        self.track=[]
+        self.VELOCITY=1 # cm/sec ili dist
 
     def pi_to_pi(self,x):
         # x in radians
@@ -173,14 +178,14 @@ class UKFDeni:
             x[z + 1] = atan2(sum_sin, sum_cos)
         return x
 
-    def localization(self,start_x,start_y,start_theta,ang,dist,
+    def localization(self,start_x,start_y,start_theta,direction,dist,
             landmarks, sigma_vel, sigma_steer, sigma_range,
             sigma_bearing, ellipse_step=1, step=10):
         """
         :param start_x: start x position
         :param start_y: start y position
         :param start_theta: start orientation 0-360 degrees
-        :param ang: which direction to go 0-360 degrees
+        :param direction: which direction to go 0-360 degrees
         :param dist: how far in cm
         :param cmds: [velocity(cm/sec), angle turning (in radians)]
         :param landmarks: [[x,y],[x,y]]
@@ -193,11 +198,8 @@ class UKFDeni:
         :return:
         """
 
-        velocity = 1  # cm/sec ili dist
-        angle_degrees = ang
-        angle_radians = math.radians(angle_degrees)
-        cmds = [[velocity, angle_radians]] * dist
-        plt.figure()
+        angle_radians = math.radians(direction)
+        cmds = [[self.VELOCITY, angle_radians]] * dist
         points = MerweScaledSigmaPoints(n=3, alpha=.00001, beta=2, kappa=0,
                                         subtract=self.residual_x)
         ukf = UKF(dim_x=3, dim_z=2 * len(landmarks), fx=self.move, hx=self.Hx,
@@ -212,21 +214,15 @@ class UKFDeni:
         ukf.Q = np.eye(3) * 0.0001
 
         sim_pos = ukf.x.copy()
-
-        # plot landmarks
-        if len(landmarks) > 0:
-            # plt.scatter(landmarks[:, 0], landmarks[:, 1], marker='s', s=60)
-            plt.scatter(landmarks[:, 1], landmarks[:, 0], s=30)
-
-        track = []
+        #################
+        # if len(landmarks) > 0:
+        #     plt.scatter(landmarks[:, 1], landmarks[:, 0], s=30)
+        self.track = [] # track the current comand of moving
         for i, u in enumerate(cmds):
             sim_pos = self.move(sim_pos, self.dt, u, self.wheelbase)
-            # print(sim_pos)
-            track.append(sim_pos)
-
+            self.track.append(sim_pos)
             if i % step == 0:
                 ukf.predict(u=u, wheelbase=self.wheelbase)
-
                 if i % ellipse_step == 0:
                     plot_covariance_ellipse(
                         (ukf.x[1], ukf.x[0]), ukf.P[0:2, 0:2], std=6,
@@ -242,19 +238,15 @@ class UKFDeni:
                                          randn() * sigma_bearing))
                     z.extend([d, a])
                 ukf.update(z, landmarks=landmarks)
-                # print(f"x: {ukf.x[0]} , y: {ukf.x[1]} , Theta: {math.degrees(ukf.x[2])}")
                 if i % ellipse_step == 0:
                     plot_covariance_ellipse(
-                        (ukf.x[1], ukf.x[0]), ukf.P[0:2, 0:2], std=6,
-                        facecolor='g', alpha=0.8)
+                        (ukf.x[1], ukf.x[0]), ukf.P[0:2, 0:2], std=6,facecolor='g', alpha=0.8)
 
-        track = np.array(track)
-        plt.plot(track[:, 1], track[:, 0], color='k', lw=2)
-        plt.axis('equal')
-        plt.title("UKF Robot localization")
-        plt.grid()
-        plt.show()
+        self.track = np.array(self.track)
         self.end_x=ukf.x[0]
         self.end_y=ukf.x[1]
         self.end_theta=self.pi_to_pi(math.degrees(ukf.x[2]))
-        return ukf
+        self.start_x = ukf.x[0]
+        self.start_y = ukf.x[1]
+        self.start_theta = self.pi_to_pi(math.degrees(ukf.x[2]))
+        return self.end_x, self.end_y, self.end_theta
