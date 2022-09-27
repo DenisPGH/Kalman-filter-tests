@@ -40,8 +40,6 @@ def move_steering(x, dt, u, wheelbase):
         return x + np.array([dist*cos(hdg), dist*sin(hdg), 0])
 
 
-
-
 def move(x, dt, u, wheelbase):
     """
     move rotation my car
