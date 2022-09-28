@@ -235,4 +235,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    #main()
+    a=bresenham([0,0],[13,30])
+    print(a)
+    full_path=np.array(a)
+    plt.plot(full_path[:, 1], full_path[:, 0], color='k', lw=2, label='filter')
+    plt.grid()
+    plt.show()
