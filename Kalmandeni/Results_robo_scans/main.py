@@ -22,10 +22,10 @@ all_points=np.array(lm)
 #landmarks=np.array([[y,x] for x,y in all_p[0]]) # [:30] control kolko landmakrs
 landmarks=np.array([[100,math.radians(0)]])
 
-land_all=[np.array([[100,math.radians(0)]]),np.array([[50,math.radians(0)]]),np.array([[10,math.radians(0)]])]
+land_all=[np.array([[100,math.radians(0)]]),np.array([[100,math.radians(0)]]),np.array([[15,math.radians(0)]])]
 
 #################### run filter ######################
-test_path=[(0,0),(0,20),(0,80),(0,20),(0,40),
+test_path=[(0,0),(0,20),(90,80),(0,20),(0,40),
             (90,40),(90,30),(90,50),(90,60),(90,10),
             (180,20),(180,50),(180,50),(180,50)
             ] # (dir,dist)
@@ -36,9 +36,9 @@ test_path=[(0,0),(0,20),(0,80),(0,20),(0,40),
 full_path=[]
 counter=0
 aa=[]
-for dir,dist in test_path[:2]: # controll the steps[:7]
+for dir,dist in test_path[:3]: # controll the steps[:7]
     a=deni.localization(deni.start_x,deni.start_y,deni.start_theta,dir,dist,land_all[counter], sigma_vel=0.5,
-    sigma_steer=np.radians(1),sigma_range=20, sigma_bearing=.01, step=1,ellipse_step=10)
+    sigma_steer=np.radians(1),sigma_range=200, sigma_bearing=.01, step=1,ellipse_step=10)
     full_path.extend(deni.track)
     print(a)
     counter+=1

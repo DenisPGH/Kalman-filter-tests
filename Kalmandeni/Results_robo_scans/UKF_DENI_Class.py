@@ -21,7 +21,7 @@ class UKFDeni:
         self.start_y = 0
         self.start_theta = 0
         self.track=[]
-        self.VELOCITY=1 # cm/sec ili dist
+        self.VELOCITY=1.24 # cm/sec ili dist 1.24
 
     def pi_to_pi(self,x):
         # x in radians
@@ -217,7 +217,7 @@ class UKFDeni:
 
         angle_radians = math.radians(direction)
         cmds = [[self.VELOCITY, angle_radians]] * dist
-        points = MerweScaledSigmaPoints(n=3, alpha=.001, beta=2, kappa=0,
+        points = MerweScaledSigmaPoints(n=3, alpha=.01, beta=2, kappa=0,
                                         subtract=self.residual_x)
         ukf = UKF(dim_x=3, dim_z=2 * len(landmarks), fx=self.move, hx=self.Hx,
                   dt=self.dt, points=points, x_mean_fn=self.state_mean,
@@ -225,10 +225,14 @@ class UKFDeni:
                   residual_z=self.residual_h)
 
         ukf.x = np.array([start_x, start_y, math.radians(start_theta)])  # [2, 6, .3] # here is the start position and orientation
-        ukf.P = np.diag([40, 40, 0.3])
+        ukf.P = np.diag([4, 4, 0.3])
         ukf.R = np.diag([sigma_range ** 2,
                          sigma_bearing ** 2] * len(landmarks))
         ukf.Q = np.eye(3) * 0.0001 # 0.0001
+        ukf.Q[0,0]= 0.1 #x
+        ukf.Q[1,1]= 0.1 # y
+        ukf.Q[2,2]= 0.1 # theta
+
 
         sim_pos = ukf.x.copy()
         #################
