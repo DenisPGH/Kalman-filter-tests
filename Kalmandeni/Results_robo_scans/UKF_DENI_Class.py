@@ -128,9 +128,9 @@ class UKFDeni:
         y[2] = self.normalize_angle(y[2])
         return y
 
-    def Hx(self,x, landmarks):
+    def Hx_old(self,x, landmarks):
         """
-        x:
+        x:[x,y,angle]
         landmarks:
         return : [dist_to_1, bearing_to_1, dist_to_2, bearing_to_2, ...].
          takes a state variable and returns the measurement
@@ -140,6 +140,23 @@ class UKFDeni:
             px, py = lmark
             dist = sqrt((px - x[0]) ** 2 + (py - x[1]) ** 2)
             angle = atan2(py - x[1], px - x[0])
+            hx.extend([dist, self.normalize_angle(angle - x[2])])
+        return np.array(hx)
+
+    def Hx(self,x, landmarks):
+        """
+        x:[x,y,angle]
+        landmarks:
+        return : [dist_to_1, bearing_to_1, dist_to_2, bearing_to_2, ...].
+         takes a state variable and returns the measurement
+        that would correspond to that state. """
+        hx = []
+        for lmark in landmarks:
+            px, py = lmark
+            # dist = sqrt((px - x[0]) ** 2 + (py - x[1]) ** 2)
+            # angle = atan2(py - x[1], px - x[0])
+            dist=px
+            angle=py
             hx.extend([dist, self.normalize_angle(angle - x[2])])
         return np.array(hx)
 
@@ -200,7 +217,7 @@ class UKFDeni:
 
         angle_radians = math.radians(direction)
         cmds = [[self.VELOCITY, angle_radians]] * dist
-        points = MerweScaledSigmaPoints(n=3, alpha=.00001, beta=2, kappa=0,
+        points = MerweScaledSigmaPoints(n=3, alpha=.001, beta=2, kappa=0,
                                         subtract=self.residual_x)
         ukf = UKF(dim_x=3, dim_z=2 * len(landmarks), fx=self.move, hx=self.Hx,
                   dt=self.dt, points=points, x_mean_fn=self.state_mean,
@@ -208,10 +225,10 @@ class UKFDeni:
                   residual_z=self.residual_h)
 
         ukf.x = np.array([start_x, start_y, math.radians(start_theta)])  # [2, 6, .3] # here is the start position and orientation
-        ukf.P = np.diag([30, 30, 1.6])
+        ukf.P = np.diag([40, 40, 0.3])
         ukf.R = np.diag([sigma_range ** 2,
                          sigma_bearing ** 2] * len(landmarks))
-        ukf.Q = np.eye(3) * 0.01 # 0.0001
+        ukf.Q = np.eye(3) * 0.0001 # 0.0001
 
         sim_pos = ukf.x.copy()
         #################
@@ -230,12 +247,22 @@ class UKFDeni:
 
                 x, y = sim_pos[1], sim_pos[0]
                 z = []
-                for lmark in landmarks:
-                    dx, dy = lmark[1] - x, lmark[0] - y
-                    d = sqrt(dx ** 2 + dy ** 2) + randn() * sigma_range
-                    bearing = atan2(lmark[0] - y, lmark[1] - x)
-                    a = (self.normalize_angle(bearing - sim_pos[2] +
-                                         randn() * sigma_bearing))
+                # for lmark in landmarks:
+                #     dx, dy = lmark[1] - x, lmark[0] - y
+                #     d = sqrt(dx ** 2 + dy ** 2) + randn() * sigma_range
+                #     bearing = atan2(lmark[0] - y, lmark[1] - x)
+                #     a = (self.normalize_angle(bearing - sim_pos[2] +
+                #                          randn() * sigma_bearing))
+                #     z.extend([d, a])
+
+                for d,a in landmarks:
+
+                    # dx, dy = lmark[1] - x, lmark[0] - y
+                    # d = sqrt(dx ** 2 + dy ** 2) + randn() * sigma_range
+                    # bearing = atan2(lmark[0] - y, lmark[1] - x)
+                    # a = (self.normalize_angle(bearing - sim_pos[2] +
+                    #                      randn() * sigma_bearing))
+                    #print(d,a)
                     z.extend([d, a])
                 ukf.update(z, landmarks=landmarks)
                 if i % ellipse_step == 0:
