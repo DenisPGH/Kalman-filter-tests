@@ -22,22 +22,22 @@ all_points=np.array(lm)
 #landmarks=np.array([[y,x] for x,y in all_p[0]]) # [:30] control kolko landmakrs
 landmarks=np.array([[100,math.radians(0)]])
 
-land_all=[np.array([[100,math.radians(0)]]),np.array([[100,math.radians(0)]]),np.array([[15,math.radians(0)]])]
-
+#land_all=[np.array([[100,math.radians(0)]]),np.array([[100,math.radians(0)]]),np.array([[15,math.radians(0)]])]
+with open("lidar_test_UKF_2.json",'r') as jso:
+    land_all=json.load(jso)
 #################### run filter ######################
-test_path=[(0,0),(0,20),(90,80),(0,20),(0,40),
+test_path=[(0,0),(0,10),(0,20),(0,70),(90,0),
             (90,40),(90,30),(90,50),(90,60),(90,10),
             (180,20),(180,50),(180,50),(180,50)
             ] # (dir,dist)
 
 
 
-
 full_path=[]
 counter=0
 aa=[]
-for dir,dist in test_path[:3]: # controll the steps[:7]
-    a=deni.localization(deni.start_x,deni.start_y,deni.start_theta,dir,dist,land_all[counter], sigma_vel=0.5,
+for dir,dist in test_path[:5]: # controll the steps[:7]
+    a=deni.localization(deni.start_x,deni.start_y,deni.start_theta,dir,dist,land_all[f"{counter+1}"], sigma_vel=0.5,
     sigma_steer=np.radians(1),sigma_range=200, sigma_bearing=.01, step=1,ellipse_step=10)
     full_path.extend(deni.track)
     print(a)
