@@ -61,7 +61,7 @@ class DeniTransformation:
 
 smile=[[0.5,2],[-0.5,2],[0,0],[-0.5,0],[0.5,0],[-1,0],[1,0],[-2,0.5],[2,0.5],[-1.5,0.25],[1.5,0.25]]
 ang=90.9
-to_x=0
+to_x=-10
 to_y=0
 color='green'
 point_size=30
@@ -85,11 +85,11 @@ data_transf=np.array(new_places_)
 x,y=data.T
 x_t,y_t=data_transf.T
 x_w,y_w=world_frame.T
-fig, ax = plt.subplots()
-ax.scatter(x, y, color=f'{color}', s=point_size)
-ax.scatter(x_t, y_t, color=f'red', s=point_size)
-ax.scatter(0, 0, color='black', s=point_size)
-ax.scatter(x_w, y_w, color='black', s=point_size)
-#ax.annotate('transpose', (x_t, y_t),fontsize=10,color='red')
-plt.grid()
-fig.show()
+# fig, ax = plt.subplots()
+# ax.scatter(x, y, color=f'{color}', s=point_size)
+# ax.scatter(x_t, y_t, color=f'red', s=point_size)
+# ax.scatter(0, 0, color='black', s=point_size)
+# ax.scatter(x_w, y_w, color='black', s=point_size)
+# #ax.annotate('transpose', (x_t, y_t),fontsize=10,color='red')
+# plt.grid()
+# fig.show()
