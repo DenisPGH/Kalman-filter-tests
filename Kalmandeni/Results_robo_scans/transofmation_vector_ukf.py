@@ -42,7 +42,7 @@ class DeniTransformation:
         trans_matrix = np.array([
             [np.cos(teta),np.sin(teta), 0],
             [-np.sin(teta),np.cos(teta), 0],
-            [new_x, new_y, 1]])
+            [-new_x, -new_y, 1]])
         result_homog_matrix=np.dot(end,trans_matrix)
         result_end=np.delete(result_homog_matrix,2,axis=1) # remove Z axis
         return result_end
