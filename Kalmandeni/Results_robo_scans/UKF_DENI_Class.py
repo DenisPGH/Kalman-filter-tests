@@ -78,6 +78,10 @@ class UKFDeni:
         vel = u[0]
         steering_angle = u[1]
         dist = vel * dt
+        error_turning=3
+        # if steering_angle !=0:
+        #     steering_angle=math.radians(math.degrees(steering_angle)+error_turning)
+
 
         if abs(steering_angle) > 0.001:  # is robot turning?
             # beta = (dist / wheelbase) * tan(steering_angle)
@@ -216,8 +220,14 @@ class UKFDeni:
         """
 
         angle_radians = math.radians(direction)
+
+        if dist==0 and direction !=0: # by turning the lidar goes away from the center of turning
+            dist+=4
+        elif dist==0:
+            dist=1
+
         cmds = [[self.VELOCITY, angle_radians]] * dist
-        points = MerweScaledSigmaPoints(n=3, alpha=.01, beta=2, kappa=0,
+        points = MerweScaledSigmaPoints(n=3, alpha=.01, beta=2, kappa=10,
                                         subtract=self.residual_x)
         ukf = UKF(dim_x=3, dim_z=2 * len(landmarks), fx=self.move, hx=self.Hx,
                   dt=self.dt, points=points, x_mean_fn=self.state_mean,
@@ -225,7 +235,7 @@ class UKFDeni:
                   residual_z=self.residual_h)
 
         ukf.x = np.array([start_x, start_y, math.radians(start_theta)])  # [2, 6, .3] # here is the start position and orientation
-        ukf.P = np.diag([4, 4, 0.3])
+        ukf.P = np.diag([4, 4, 0.3]) #4,4,0.3
         ukf.R = np.diag([sigma_range ** 2,
                          sigma_bearing ** 2] * len(landmarks))
         ukf.Q = np.eye(3) * 0.0001 # 0.0001
