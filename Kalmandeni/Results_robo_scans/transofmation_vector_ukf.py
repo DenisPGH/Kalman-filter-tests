@@ -47,6 +47,27 @@ class DeniTransformation:
         result_end=np.delete(result_homog_matrix,2,axis=1) # remove Z axis
         return result_end
 
+
+    def translocation_new_version(self,coordinates,from_x,from_y,new_x,new_y,teta):
+        """
+        :param teta: angle which to turn
+        :param coordinates: cur_coor of all points
+        :param new_x: where in x
+        :param new_y: where in y
+        :return:
+        """
+        x=new_x+(new_x+from_x)
+        y=new_y+(new_y+from_y)
+        end = np.insert(coordinates, 2, 1, axis=1) # add a Z axis
+        teta=np.radians(teta)
+        trans_matrix = np.array([
+            [np.cos(teta),np.sin(teta), 0],
+            [-np.sin(teta),np.cos(teta), 0],
+            [x, y, 1]])
+        result_homog_matrix=np.dot(end,trans_matrix)
+        result_end=np.delete(result_homog_matrix,2,axis=1) # remove Z axis
+        return result_end
+
     def linear_transformation(self,coordinates_point:list, angle):
         """ [x,y] input
         return the coord of the vector(point), by transformation of the coord frame acording the angle """
