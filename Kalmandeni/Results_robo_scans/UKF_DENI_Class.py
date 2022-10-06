@@ -45,13 +45,11 @@ class UKFDeni:
         :param wheelbase: how wide is the robot base
         :return: robot goes ahead or turning
         """
-
         hdg = x[2]
         vel = u[0]
         # print(f"vel= {u[1]}")
         steering_angle = u[1]
         dist = vel * dt
-
         if abs(steering_angle) > 0.001:  # is robot turning?
             beta = (dist / wheelbase) * tan(steering_angle)
             r = wheelbase / tan(steering_angle)  # radius
@@ -81,13 +79,10 @@ class UKFDeni:
         error_turning=3
         # if steering_angle !=0:
         #     steering_angle=math.radians(math.degrees(steering_angle)+error_turning)
-
-
         if abs(steering_angle) > 0.001:  # is robot turning?
             # beta = (dist / wheelbase) * tan(steering_angle)
             beta = steering_angle
             r = wheelbase / tan(steering_angle)  # radius
-
             sinh, sinhb = sin(hdg), sin(hdg)
             cosh, coshb = cos(hdg), cos(hdg)
             # return x + np.array([-r*sinh + r*sinhb, r*cosh - r*coshb, beta])

@@ -56,8 +56,10 @@ class DeniTransformation:
         :param new_y: where in y
         :return:
         """
-        x=new_x+(new_x+from_x)
-        y=new_y+(new_y+from_y)
+        # x=new_x-(new_x-from_x)
+        # y=new_y-(new_y-from_y)
+        x=new_x
+        y=new_y
         end = np.insert(coordinates, 2, 1, axis=1) # add a Z axis
         teta=np.radians(teta)
         trans_matrix = np.array([

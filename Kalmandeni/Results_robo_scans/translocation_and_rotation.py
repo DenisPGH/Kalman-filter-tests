@@ -85,7 +85,7 @@ for node,info in land_all_points.items():
     a = ukfdeni.localization(ukfdeni.start_x, ukfdeni.start_y, ukfdeni.start_theta, test_path[counter][0],
                     test_path[counter][1], info,sigma_vel=0.5,
             sigma_steer=np.radians(1), sigma_range=200, sigma_bearing=.01,step=1, ellipse_step=10)
-    print(a)
+    #print(a)
     for angle,dist in info:
         x,y=coordinates_for_x_y__from_distance_and_angle(
             a[2],a[1],a[0],angle,dist)
@@ -96,7 +96,7 @@ for node,info in land_all_points.items():
         cur_list.append((x,y))
     dict_node_coord[counter]=cur_list
     center_2 = center_of_gravity(cur_list)
-    #print(f'{counter} center bevor {center_2}')
+    print(f'{counter} center bevor {center_2}')
 
     if counter==0:
         center = center_of_gravity(dict_node_coord[counter])
@@ -107,7 +107,7 @@ for node,info in land_all_points.items():
         to_y=center_2[1]+center[1]
         new_places_ = DT.translocation_new_version(cur_list,center_2[0],center_2[1],center[0],center[1], 0)
     center_ = center_of_gravity(new_places_)
-    #print(f'{counter} center after {center_}')
+    print(f'{counter} center after {center_}')
     list_with_corrected_coordinates.extend(new_places_)
     x=center_2[0]-center[0]
     y=center_2[1]-center[1]
@@ -134,7 +134,7 @@ landmarks_4= np.array(DT.translocation(list_coord_without_ukf,300,0, 0))
 # show
 
 plt.scatter(landmarks[:, 0], landmarks[:, 1], s=5,c='green',label=f' UKF with {len(landmarks)}')
-#plt.scatter(landmarks_2[:, 0], landmarks_2[:, 1], s=5,c='blue',label=f'with point cloud')
+plt.scatter(landmarks_2[:, 0], landmarks_2[:, 1], s=5,c='blue',label=f'with point matching')
 #plt.scatter(landmarks_3[:, 0], landmarks_3[:, 1], s=5,c='red',label=f'pure comands')
 plt.scatter(landmarks_4[:, 0], landmarks_4[:, 1], s=5,c='red',label=f'pure comands')
 plt.scatter(rob[:, 0], rob[:, 1],c='black',label='coordinates robot') # all detected points
