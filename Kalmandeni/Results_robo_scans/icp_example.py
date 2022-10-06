@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -46,6 +48,7 @@ def compute_R_t(W, MuQ, MuP):
     U, S, V = np.linalg.svd(W)
     R = U @ V
     t = MuQ - R @ MuP
+
     return [R, t]
 
 
@@ -66,8 +69,8 @@ def show_figure(Line1, Line2):
     plt.scatter(Line1[0], Line1[1], marker='o', s=2, label='Line 1')
     plt.scatter(Line2[0], Line2[1], s=1, label='Line 2')
 
-    plt.xlim([-8, 8])
-    plt.ylim([-8, 8])
+    plt.xlim([-400, 400])
+    plt.ylim([-400, 400])
     plt.legend()
 
     plt.show()
@@ -104,8 +107,17 @@ def update_figure(fig, line1_fig, line2_fig, Line1, Line2, hold=False):
 #Data = np.load('icp_data.npz')
 # Line1 = Data['LineGroundTruth']
 # Line2 = Data['LineMovedCorresp']
-Line1=np.array([[0,0,0],[1,2,3]],dtype='float64')
-Line2=np.array([[1,1,1],[4,5,6]],dtype='float64')
+with open("js.json",'r') as jso:
+    testt=json.load(jso)
+
+a=np.array(testt['1']["node_points"][:166])
+b=np.array(testt['2']["node_points"][:166])
+
+
+Line1=np.array([a[:,0],a[:,1]])
+Line2=np.array([b[:,0],b[:,1]])
+# Line1=np.array([[10,5,6],[10,10,10]],dtype='float64')
+# Line2=np.array([[10,5,6],[10,10,10]],dtype='float64')
 
 
 # Show the initial positions of the lines
