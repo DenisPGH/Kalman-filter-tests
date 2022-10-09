@@ -107,6 +107,8 @@ def update_figure(fig, line1_fig, line2_fig, Line1, Line2, hold=False):
 #Data = np.load('icp_data.npz')
 # Line1 = Data['LineGroundTruth']
 # Line2 = Data['LineMovedCorresp']
+
+################### TEST HERE ###################
 with open("js.json",'r') as jso:
     testt=json.load(jso)
 
@@ -121,7 +123,7 @@ Line2=np.array([b[:,0],b[:,1]])
 
 
 # Show the initial positions of the lines
-show_figure(Line1, Line2)
+#show_figure(Line1, Line2)
 
 # We assume that the there are 1 to 1 correspondences for this data
 QInd = np.arange(len(Line1[0]))
@@ -135,3 +137,4 @@ show_figure(Line1, Line2)
 
 # print the error
 print('Error value is: ', E)
+
