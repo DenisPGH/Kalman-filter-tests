@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.linalg import inv
+from numpy.linalg import pinv
 
 def translocation( coordinates, new_x, new_y, teta):
 
@@ -15,16 +16,16 @@ def translocation( coordinates, new_x, new_y, teta):
 
 
 res=translocation(np.array([(0,0)]),10,0,0)
+
+print(pinv(res))
+new_x=10
+new_y=0
+teta=0
+trans_matrix = np.array([
+        [np.cos(teta), np.sin(teta), 0],
+        [-np.sin(teta), np.cos(teta), 0],
+        [-new_x, -new_y, 1]])
+start_point=np.array([0,0,0])
+end = np.insert(start_point, 2, 1, axis=1) # add a Z axis
+res=np.dot(end,trans_matrix)
 print(res)
-#print(inv(res))
-# new_x=10
-# new_y=0
-# teta=0
-# trans_matrix = np.array([
-#         [np.cos(teta), np.sin(teta), 0],
-#         [-np.sin(teta), np.cos(teta), 0],
-#         [-new_x, -new_y, 1]])
-# start_point=np.array([0,0,0])
-# end = np.insert(start_point, 2, 1, axis=1) # add a Z axis
-# res=np.dot(end,trans_matrix)
-# print(res)

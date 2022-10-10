@@ -37,6 +37,9 @@ Point to point matching has been done using Gauss-Newton only
 
 import numpy as np
 import re
+
+from numpy.linalg import pinv
+
 import transformations as transform
 
 
@@ -91,13 +94,14 @@ def icp_point_to_plane(source_points, dest_points,loop):
     
     for i in range (0,dest_points.shape[0]-1):
         
-        #print dest_points[i][3],dest_points[i][4],dest_points[i][5]
+        #print( dest_points[i][3],dest_points[i][4],dest_points[i][5])
         dx = dest_points[i][0]
         dy = dest_points[i][1]
         dz = dest_points[i][2]
         nx = dest_points[i][3]
         ny = dest_points[i][4]
         nz = dest_points[i][5]
+
         
         sx = source_points[i][0]
         sy = source_points[i][1]
@@ -123,8 +127,11 @@ def icp_point_to_plane(source_points, dest_points,loop):
     A_ = np.linalg.pinv(A1)    
     
     tr = np.dot(A_,b)
+    print(tr)
+    #print(pinv(tr))
     
-    print( str(tr[0])+','+str(tr[1])+','+str(tr[2])+','+str(tr[3])+','+str(tr[4])+','+str(tr[5]))
+    #print( str(tr[0])+','+str(tr[1])+','+str(tr[2])+','+str(tr[3])+','+str(tr[4])+','+str(tr[5]))
+    #print(tr[0])
     
     R = transform.euler_matrix(tr[0],tr[1],tr[2])
     R[0,3] = tr[3]
@@ -165,7 +172,8 @@ def icp_point_to_point_lm(source_points, dest_points,initial,loop):
     
     for i in range (0,dest_points.shape[0]-1):
         
-        #print dest_points[i][3],dest_points[i][4],dest_points[i][5]
+        #print('a',dest_points[i][3],dest_points[i][4],dest_points[i][5])
+        #print(dest_points[i][0])
         dx = dest_points[i][0]
         dy = dest_points[i][1]
         dz = dest_points[i][2]
@@ -201,12 +209,14 @@ def icp_point_to_point_lm(source_points, dest_points,initial,loop):
     residual = np.array(e)
     
     update = -np.dot(np.dot(np.linalg.pinv(np.dot(np.transpose(jacobian),jacobian)),np.transpose(jacobian)),residual)
-    
-    #print update, initial
+    #print(update)
+    #print( update, initial)
     
     initial = initial + update
+    print(initial)
+
     
-    print( np.transpose(initial))
+    #print( np.transpose(initial))
     
     loop = loop + 1
     
@@ -274,14 +284,16 @@ def icp_point_to_plane_lm(source_points, dest_points,initial,loop):
     #print update, initial
     
     initial = initial + update
+    print(initial)
     
-    print('a',np.transpose(initial))
+    #print('a',np.transpose(initial))
     
     loop = loop + 1
     
     if(loop < 50):  # here lies the control variable, control the number of iteration from here
     
         icp_point_to_point_lm(source_points,dest_points,initial, loop)
+
 
 
 # fileOriginal = '/home/asengupt/Documents/icp/data/original.xyz'

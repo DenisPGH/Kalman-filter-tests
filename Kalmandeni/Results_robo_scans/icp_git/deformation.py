@@ -23,7 +23,7 @@ R[0,3] = tx
 R[1,3] = ty
 R[2,3] = tz
 
-print R
+print(R)
 
 with open('/home/asengupt/Downloads/sample/bunny2.xyz') as f:
     content = f.readlines()
@@ -33,13 +33,13 @@ with open('/home/asengupt/Downloads/sample/bunny2.xyz') as f:
         y = float(re.split('\s+', line)[1])
         z = float(re.split('\s+', line)[2])
         
-        print x,y,z
+        print (x,y,z)
         
         b = np.array([(x),(y),(z),(1)])
         
         P = np.dot(R,b)
         
-        print P
+        print( P)
         
         if ((float(re.split('\s+', line)[3]) != 0) and (float(re.split('\s+', line)[4]) != 0) and (float(re.split('\s+', line)[5]) != 0)):
         
