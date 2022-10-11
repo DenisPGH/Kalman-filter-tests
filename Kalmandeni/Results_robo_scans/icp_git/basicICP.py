@@ -127,7 +127,8 @@ def icp_point_to_plane(source_points, dest_points,loop):
     A_ = np.linalg.pinv(A1)    
     
     tr = np.dot(A_,b)
-    print(tr)
+    #print(tr)
+
     #print(pinv(tr))
     
     #print( str(tr[0])+','+str(tr[1])+','+str(tr[2])+','+str(tr[3])+','+str(tr[4])+','+str(tr[5]))
@@ -137,22 +138,16 @@ def icp_point_to_plane(source_points, dest_points,loop):
     R[0,3] = tr[3]
     R[1,3] = tr[4]
     R[2,3] = tr[5]
-    
     source_transformed = []
-    
     for i in range (0,dest_points.shape[0]-1):
         ss = np.array([(source_points[i][0]),(source_points[i][1]),(source_points[i][2]),(1)])
         p = np.dot(R,ss)
         source_transformed.append(p)
-        
     source_points = np.array(source_transformed)
-    
-    
     loop = loop + 1
-    
-    if(loop < 3):   #although this should converge in one step (which it does), you might want to reiterate over and over, just for the fun of it!
-    
+    if(loop < 1):   #although this should converge in one step (which it does), you might want to reiterate over and over, just for the fun of it!
         icp_point_to_plane(source_points,dest_points,loop)
+    return tr
                 
         
 def icp_point_to_point_lm(source_points, dest_points,initial,loop):
@@ -213,14 +208,14 @@ def icp_point_to_point_lm(source_points, dest_points,initial,loop):
     #print( update, initial)
     
     initial = initial + update
-    print(initial)
+    #print(initial)
 
     
-    #print( np.transpose(initial))
+    print( np.transpose(initial))
     
     loop = loop + 1
     
-    if(loop < 50):  # here lies the control variable, control the number of iteration from here
+    if(loop < 5):  # here lies the control variable, control the number of iteration from here
     
         icp_point_to_point_lm(source_points,dest_points,initial, loop)
         
@@ -284,9 +279,9 @@ def icp_point_to_plane_lm(source_points, dest_points,initial,loop):
     #print update, initial
     
     initial = initial + update
-    print(initial)
+    #print(initial)
     
-    #print('a',np.transpose(initial))
+    print('a',np.transpose(initial))
     
     loop = loop + 1
     
