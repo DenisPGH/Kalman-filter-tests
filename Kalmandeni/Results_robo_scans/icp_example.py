@@ -1,4 +1,5 @@
 import json
+import math
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,9 +7,34 @@ import matplotlib.pyplot as plt
 
 # icp_known_corresp: performs icp given that the input datasets
 # are aligned so that Line1(:, QInd(k)) corresponds to Line2(:, PInd(k))
+
+def coordinates_for_x_y__from_distance_and_angle( orientation_angle, x_base, y_base, angle, distance):
+    """
+    :param orientation_angle: which direction in the world is oriented the robot
+    :param x_base: where is lidar on x
+    :param y_base: where is lidar on y
+    :param angle: in degree ,0 is +y
+    :param distance: from lidar to the point
+    :return: new coordiantes of the found point
+    """
+    new_x = distance * math.sin(math.radians(angle + orientation_angle))
+    new_y = distance * math.cos(math.radians(angle + orientation_angle))
+    final_x = x_base + new_x
+    final_y = y_base + new_y
+    final_x = round(final_x, 2)
+    final_y = round(final_y, 2)
+    if final_x == 0 or final_x == -0:
+        final_x = 0
+    if final_y == 0 or final_y == -0:
+        final_y = 0
+    return final_x, final_y
+
+
+
 def icp_known_corresp(Line1, Line2, QInd, PInd):
     Q = Line1[:, QInd]
     P = Line2[:, PInd]
+
 
     MuQ = compute_mean(Q)
     MuP = compute_mean(P)
@@ -17,17 +43,10 @@ def icp_known_corresp(Line1, Line2, QInd, PInd):
 
     [R, t] = compute_R_t(W, MuQ, MuP)
 
-    # Compute the new positions of the points after
-    # applying found rotation and translation to them
     NewLine = R @ P
 
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    # If i don't add t to the NewLine the results are good. #
-    # If i add t, there will be a gap between two curves.   #
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-    # NewLine[0, :] += t[0]
-    # NewLine[1, :] += t[1]
+    NewLine[0, :] += t[0]
+    NewLine[1, :] += t[1]
 
     E = compute_error(Q, NewLine)
     return [NewLine, E]
@@ -45,16 +64,19 @@ def compute_W(Q, P, MuQ, MuP):
 # compute_R_t: compute rotation matrix and translation vector
 # based on the SVD as presented in the lecture
 def compute_R_t(W, MuQ, MuP):
-    U, S, V = np.linalg.svd(W)
-    R = U @ V
-    t = MuQ - R @ MuP
+    U, S, V= np.linalg.svd(W)
+    R = V @ U.T
+    t = MuQ - (R @ MuP)
 
     return [R, t]
 
 
 # compute_mean: compute mean value for a [M x N] matrix
 def compute_mean(M):
-    return np.mean(M, axis=1)
+    # center of mass
+    res=np.mean(M, axis=1)
+
+    return res
 
 
 # compute_error: compute the icp error
@@ -69,8 +91,10 @@ def show_figure(Line1, Line2):
     plt.scatter(Line1[0], Line1[1], marker='o', s=2, label='Line 1')
     plt.scatter(Line2[0], Line2[1], s=1, label='Line 2')
 
-    plt.xlim([-400, 400])
-    plt.ylim([-400, 400])
+    world=400 #400
+
+    plt.xlim([-world, world])
+    plt.ylim([-world, world])
     plt.legend()
 
     plt.show()
@@ -109,17 +133,29 @@ def update_figure(fig, line1_fig, line2_fig, Line1, Line2, hold=False):
 # Line2 = Data['LineMovedCorresp']
 
 ################### TEST HERE ###################
-with open("js.json",'r') as jso:
+with open("lidar_test_UKF.json",'r') as jso:
     testt=json.load(jso)
 
-a=np.array(testt['1']["node_points"][:166])
-b=np.array(testt['2']["node_points"][:166])
+
+
+# a=np.array(testt['1']["node_points"][:166])
+# b=np.array(testt['2']["node_points"][:166])
+robot_coordinates=[(0,0),(0,10),(0,30),(0,100),(0,100)]
+c=3
+c_2=4
+min_=min(len(testt[f"{c}"]),len(testt[f"{c_2}"]))
+
+a=np.array([coordinates_for_x_y__from_distance_and_angle(0,robot_coordinates[c-1][0],robot_coordinates[c-1][1],ang,dist)   for ang,dist in testt[f"{c}"][:min_]])
+b=np.array([coordinates_for_x_y__from_distance_and_angle(0,robot_coordinates[c_2-1][0],robot_coordinates[c_2-1][1],ang,dist)   for ang,dist in testt[f"{c_2}"][:min_]])
+
+
+
 
 
 Line1=np.array([a[:,0],a[:,1]])
 Line2=np.array([b[:,0],b[:,1]])
-# Line1=np.array([[10,5,6],[10,10,10]],dtype='float64')
-# Line2=np.array([[10,5,6],[10,10,10]],dtype='float64')
+# Line1=np.array([[0,2,4],[0,2,4]],dtype='float64')
+# Line2=np.array([[-2,0,2],[-2,0,2]],dtype='float64')
 
 
 # Show the initial positions of the lines
@@ -130,7 +166,8 @@ QInd = np.arange(len(Line1[0]))
 PInd = np.arange(len(Line2[0]))
 
 # Perform icp given the correspondences
-[Line2, E] = icp_known_corresp(Line1, Line2, QInd, PInd)
+for a in range(2):
+    [Line2, E] = icp_known_corresp(Line1, Line2, QInd, PInd)
 
 # Show the adjusted positions of the lines
 show_figure(Line1, Line2)
