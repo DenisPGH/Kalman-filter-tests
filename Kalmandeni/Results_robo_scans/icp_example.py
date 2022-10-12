@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 
 # icp_known_corresp: performs icp given that the input datasets
 # are aligned so that Line1(:, QInd(k)) corresponds to Line2(:, PInd(k))
+from Results_robo_scans.transofmation_vector_ukf import DeniTransformation
+
 
 def coordinates_for_x_y__from_distance_and_angle( orientation_angle, x_base, y_base, angle, distance):
     """
@@ -34,20 +36,13 @@ def coordinates_for_x_y__from_distance_and_angle( orientation_angle, x_base, y_b
 def icp_known_corresp(Line1, Line2, QInd, PInd):
     Q = Line1[:, QInd]
     P = Line2[:, PInd]
-
-
     MuQ = compute_mean(Q)
     MuP = compute_mean(P)
-
     W = compute_W(Q, P, MuQ, MuP)
-
     [R, t] = compute_R_t(W, MuQ, MuP)
-
     NewLine = R @ P
-
     NewLine[0, :] += t[0]
     NewLine[1, :] += t[1]
-
     E = compute_error(Q, NewLine)
     return [NewLine, E]
 
@@ -141,17 +136,18 @@ with open("lidar_test_UKF.json",'r') as jso:
 # a=np.array(testt['1']["node_points"][:166])
 # b=np.array(testt['2']["node_points"][:166])
 robot_coordinates=[(0,0),(0,10),(0,30),(0,100),(0,100)]
-c=3
-c_2=4
+c=1
+c_2=1
 min_=min(len(testt[f"{c}"]),len(testt[f"{c_2}"]))
+start_=0
 
-a=np.array([coordinates_for_x_y__from_distance_and_angle(0,robot_coordinates[c-1][0],robot_coordinates[c-1][1],ang,dist)   for ang,dist in testt[f"{c}"][:min_]])
-b=np.array([coordinates_for_x_y__from_distance_and_angle(0,robot_coordinates[c_2-1][0],robot_coordinates[c_2-1][1],ang,dist)   for ang,dist in testt[f"{c_2}"][:min_]])
-
-
+dt=DeniTransformation()
 
 
 
+a=np.array([coordinates_for_x_y__from_distance_and_angle(0,robot_coordinates[c-1][0],robot_coordinates[c-1][1],ang,dist)   for ang,dist in testt[f"{c}"][start_:min_]])
+b=np.array([coordinates_for_x_y__from_distance_and_angle(0,robot_coordinates[c_2-1][0],robot_coordinates[c_2-1][1],ang,dist)   for ang,dist in testt[f"{c_2}"][start_:min_]])
+#b=np.array(dt.translocation(b,100,100,190))
 Line1=np.array([a[:,0],a[:,1]])
 Line2=np.array([b[:,0],b[:,1]])
 # Line1=np.array([[0,2,4],[0,2,4]],dtype='float64')
@@ -161,17 +157,18 @@ Line2=np.array([b[:,0],b[:,1]])
 # Show the initial positions of the lines
 #show_figure(Line1, Line2)
 
-# We assume that the there are 1 to 1 correspondences for this data
-QInd = np.arange(len(Line1[0]))
-PInd = np.arange(len(Line2[0]))
+
+
 
 # Perform icp given the correspondences
-for a in range(2):
-    [Line2, E] = icp_known_corresp(Line1, Line2, QInd, PInd)
-
-# Show the adjusted positions of the lines
-show_figure(Line1, Line2)
-
-# print the error
-print('Error value is: ', E)
+# for _ in range(2):
+#     QInd = np.arange(len(Line1[0])) # are 1 to 1 correspondences for this data
+#     PInd = np.arange(len(Line2[0]))
+#     [Line2, E] = icp_known_corresp(Line1, Line2, QInd, PInd)
+#
+# # Show the adjusted positions of the lines
+# show_figure(Line1, Line2)
+#
+# # print the error
+# print('Error value is: ', E) # 290 is good
 

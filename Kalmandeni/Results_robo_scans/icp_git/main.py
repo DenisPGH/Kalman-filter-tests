@@ -1,4 +1,6 @@
 import json
+
+from Results_robo_scans.icp_example import coordinates_for_x_y__from_distance_and_angle
 from Results_robo_scans.icp_git.basicICP import icp_point_to_plane_lm, icp_point_to_plane, icp_point_to_point_lm
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,11 +12,21 @@ from Results_robo_scans.transofmation_vector_ukf import DeniTransformation
 # dest_points_et_normal = read_file_deformed(deformed)
 
 
-with open("js.json",'r') as jso:
+with open("lidar_test_UKF.json",'r') as jso:
     testt=json.load(jso)
 
-a =np.array(testt['1']["node_points"])
-b=np.array(testt['5']["node_points"])
+robot_coordinates=[(0,0),(0,10),(0,30),(0,100),(90,100)]
+c=1
+c_2=4
+min_=min(len(testt[f"{c}"]),len(testt[f"{c_2}"]))
+start_=0
+
+# a =np.array(testt['1'])
+# b=np.array(testt['2'])
+a=np.array([coordinates_for_x_y__from_distance_and_angle(0,robot_coordinates[c-1][0],robot_coordinates[c-1][1],ang,dist)   for ang,dist in testt[f"{c}"][start_:min_]])
+b=np.array([coordinates_for_x_y__from_distance_and_angle(0,robot_coordinates[c_2-1][0],robot_coordinates[c_2-1][1],ang,dist)   for ang,dist in testt[f"{c_2}"][start_:min_]])
+#b=np.array(dt.translocation(b,100,100,190))
+
 a=np.insert(a, 2, 0, axis=1) # add a Z axis=0
 
 b=np.insert(b, 2, 0, axis=1) # add a Z axis=0
@@ -44,12 +56,12 @@ initial = np.array([[0], [0], [0], [0], [0], [0]]) # start position
 
 
 transpose=icp_point_to_plane(Line2,Line1,0)
-print(transpose)
+#print(transpose)
 print("dddddddddddddddddddddddddddddddd")
 
-icp_point_to_point_lm(Line2,Line1,initial,0)
+#icp_point_to_point_lm(Line2,Line1,initial,0)
 print("dddddddddddddddddddddddddddddddd")
-icp_point_to_plane_lm(Line2,Line1,initial,0)
+#icp_point_to_plane_lm(Line2,Line1,initial,0)
 
 #################
 
@@ -63,7 +75,7 @@ b=np.delete(b,2,axis=1) # remove Z axis
 
 
 DT=DeniTransformation()
-c=DT.translocation(b,13.56,0.21,0)
+c=DT.translocation(b,0,0,0)
 c=np.array(c)
 # x,y=data.T
 # x_t,y_t=data_transf.T
@@ -77,7 +89,7 @@ res=np.array(np.dot(test_.T,transpose))
 
 plt.scatter(a[:,0], a[:,1], color=f'red', s=5,label='first scan')
 plt.scatter(b[:,0], b[:,1], color=f'green', s=5,label='second scan')
-plt.scatter(c[:,0], c[:,1], color=f'blue', s=5,label='transformed')
+#plt.scatter(c[:,0], c[:,1], color=f'blue', s=5,label='transformed')
 #plt.scatter(res[:,0], res[:,1], color=f'yellow', s=5,label='transformed_icp')
 plt.legend(loc='upper left')
 plt.grid()

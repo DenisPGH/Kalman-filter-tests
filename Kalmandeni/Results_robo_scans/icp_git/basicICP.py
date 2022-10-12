@@ -144,6 +144,7 @@ def icp_point_to_plane(source_points, dest_points,loop):
         p = np.dot(R,ss)
         source_transformed.append(p)
     source_points = np.array(source_transformed)
+    print(source_points)
     loop = loop + 1
     if(loop < 1):   #although this should converge in one step (which it does), you might want to reiterate over and over, just for the fun of it!
         icp_point_to_plane(source_points,dest_points,loop)
