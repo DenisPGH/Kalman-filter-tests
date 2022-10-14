@@ -34,6 +34,15 @@ def coordinates_for_x_y__from_distance_and_angle( orientation_angle, x_base, y_b
 
 
 def icp_known_corresp(Line1, Line2, QInd, PInd):
+    """
+
+    :param Line1: set a
+    :param Line2: set b
+    :param QInd: corespondices in a
+    :param PInd: coresp in b
+    :return:
+    """
+
     Q = Line1[:, QInd]
     P = Line2[:, PInd]
     MuQ = compute_mean(Q)
@@ -53,7 +62,8 @@ def compute_W(Q, P, MuQ, MuP):
     Q[1, :] -= MuQ[1]
     P[0, :] -= MuP[0]
     P[1, :] -= MuP[1]
-    return Q @ P.T
+    w=Q @ P.T
+    return w
 
 
 # compute_R_t: compute rotation matrix and translation vector
@@ -85,6 +95,10 @@ def show_figure(Line1, Line2):
     plt.figure()
     plt.scatter(Line1[0], Line1[1], marker='o', s=2, label='Line 1')
     plt.scatter(Line2[0], Line2[1], s=1, label='Line 2')
+    DT = DeniTransformation()
+    t=DT.translocation_new_version(Line2.T,0,-10,40)
+    #print(t)
+    plt.scatter(t[:,0], t[:,1], s=1, label='rotated')
 
     world=400 #400
 
@@ -128,7 +142,7 @@ def update_figure(fig, line1_fig, line2_fig, Line1, Line2, hold=False):
 # Line2 = Data['LineMovedCorresp']
 
 ################### TEST HERE ###################
-with open("lidar_test_UKF.json",'r') as jso:
+with open("lidar_test_UKF_2.json",'r') as jso:
     testt=json.load(jso)
 
 
@@ -137,7 +151,7 @@ with open("lidar_test_UKF.json",'r') as jso:
 # b=np.array(testt['2']["node_points"][:166])
 robot_coordinates=[(0,0),(0,10),(0,30),(0,100),(0,100)]
 c=1
-c_2=1
+c_2=5
 min_=min(len(testt[f"{c}"]),len(testt[f"{c_2}"]))
 start_=0
 
@@ -160,15 +174,15 @@ Line2=np.array([b[:,0],b[:,1]])
 
 
 
-# Perform icp given the correspondences
-# for _ in range(2):
-#     QInd = np.arange(len(Line1[0])) # are 1 to 1 correspondences for this data
-#     PInd = np.arange(len(Line2[0]))
-#     [Line2, E] = icp_known_corresp(Line1, Line2, QInd, PInd)
-#
-# # Show the adjusted positions of the lines
-# show_figure(Line1, Line2)
-#
-# # print the error
-# print('Error value is: ', E) # 290 is good
+##Perform icp given the correspondences
+for _ in range(2):
+    QInd = np.arange(len(Line1[0][:20])) # are 1 to 1 correspondences for this data
+    PInd = np.arange(len(Line2[0][:20]))
+    [Line2, E] = icp_known_corresp(Line1, Line2, QInd, PInd)
+
+# Show the adjusted positions of the lines
+show_figure(Line1, Line2)
+
+# print the error
+print('Error value is: ', E) # 290 is good
 

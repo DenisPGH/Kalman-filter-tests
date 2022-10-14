@@ -48,7 +48,7 @@ class DeniTransformation:
         return result_end
 
 
-    def translocation_new_version(self,coordinates,from_x,from_y,new_x,new_y,teta):
+    def translocation_new_version(self,coordinates,new_x,new_y,teta):
         """
         :param teta: angle which to turn
         :param coordinates: cur_coor of all points
@@ -63,9 +63,9 @@ class DeniTransformation:
         end = np.insert(coordinates, 2, 1, axis=1) # add a Z axis
         teta=np.radians(teta)
         trans_matrix = np.array([
-            [np.cos(teta),np.sin(teta), 0],
-            [-np.sin(teta),np.cos(teta), 0],
-            [x, y, 1]])
+            [np.cos(teta),-np.sin(teta), x],
+            [np.sin(teta),np.cos(teta), y],
+            [0, 0, 1]])
         result_homog_matrix=np.dot(end,trans_matrix)
         result_end=np.delete(result_homog_matrix,2,axis=1) # remove Z axis
         return result_end

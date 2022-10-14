@@ -64,7 +64,7 @@ def icp_point_to_point_lm(source_points, dest_points, initial, loop):
     initial = initial + update
     print(initial)
     loop = loop + 1
-    if (loop < 1):
+    if (loop < 3):
         icp_point_to_point_lm(source_points, dest_points, initial, loop)
 
 
@@ -73,7 +73,7 @@ with open("lidar_test_UKF_2.json",'r') as jso:
 
 
 robot_coordinates=[(0,0,0),(0,10,0),(0,30,0),(0,100,0),(0,100,90)] # (x,y,theta)
-c=3
+c=1
 c_2=4
 min_=min(len(testt[f"{c}"]),len(testt[f"{c_2}"]))
 start_=0
@@ -111,8 +111,8 @@ test_=Line2.copy()
 # print(Line1)
 
 #initial = np.array([[0.01], [0.05], [0.01], [0.001], [0.001], [0.001]])
-calc_dist_x= robot_coordinates[c_2 - 1][1] - robot_coordinates[c - 1][1]
-print('dddd', calc_dist_x)
+calc_dist_y= robot_coordinates[c_2 - 1][1] - robot_coordinates[c - 1][1]
+print('dddd', calc_dist_y)
 initial = np.array([[0], [0], [0], [0], [0], [0]]) # alpha, beta, gamma, tx, ty, tz
 
 
@@ -138,7 +138,9 @@ b=np.delete(b,2,axis=1) # remove Z axis
 
 
 DT=DeniTransformation()
-c=DT.translocation(b,-3,-26,0)
+c=DT.translocation_new_version(b,7,25.53,2)
+#c=[coordinates_for_x_y__from_distance_and_angle(2.41,3.95,126.98,ang,dist)   for ang,dist in testt[f"{c_2}"][start_:min_]]
+#b=np.array(dt.translocation(b,100,100,190))
 c=np.array(c)
 # x,y=data.T
 # x_t,y_t=data_transf.T
