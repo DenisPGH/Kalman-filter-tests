@@ -258,7 +258,7 @@ def icp_point_to_plane_lm(source_points, dest_points,initial,loop):
     
     loop = loop + 1
     
-    if(loop < 50):  # here lies the control variable, control the number of iteration from here
+    if(loop < 1):  # here lies the control variable, control the number of iteration from here
     
         icp_point_to_point_lm(source_points,dest_points,initial, loop)
 

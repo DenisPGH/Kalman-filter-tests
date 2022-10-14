@@ -113,7 +113,7 @@ test_=Line2.copy()
 #initial = np.array([[0.01], [0.05], [0.01], [0.001], [0.001], [0.001]])
 calc_dist_x= robot_coordinates[c_2 - 1][1] - robot_coordinates[c - 1][1]
 print('dddd', calc_dist_x)
-initial = np.array([[0], [0], [0], [0], [calc_dist_x], [0]]) # alpha, beta, gamma, tx, ty, tz
+initial = np.array([[0], [0], [0], [0], [0], [0]]) # alpha, beta, gamma, tx, ty, tz
 
 
 
