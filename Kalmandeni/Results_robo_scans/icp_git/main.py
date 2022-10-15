@@ -71,6 +71,7 @@ def icp_point_to_point_lm(source_points, dest_points, initial, loop):
 with open("lidar_test_UKF_2.json",'r') as jso:
     testt=json.load(jso)
 
+print(np.array(testt['1'])[:,1])
 
 robot_coordinates=[(0,0,0),(0,10,0),(0,30,0),(0,100,0),(0,100,90)] # (x,y,theta)
 c=1
