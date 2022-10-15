@@ -96,7 +96,7 @@ def show_figure(Line1, Line2):
     plt.scatter(Line1[0], Line1[1], marker='o', s=2, label='Line 1')
     plt.scatter(Line2[0], Line2[1], s=1, label='Line 2')
     DT = DeniTransformation()
-    t=DT.translocation_new_version(Line2.T,0,-10,40)
+    t=DT.translocation_new_version(Line2.T,0,0,-32)
     #print(t)
     plt.scatter(t[:,0], t[:,1], s=1, label='rotated')
 
@@ -150,8 +150,8 @@ with open("lidar_test_UKF_2.json",'r') as jso:
 # a=np.array(testt['1']["node_points"][:166])
 # b=np.array(testt['2']["node_points"][:166])
 robot_coordinates=[(0,0),(0,10),(0,30),(0,100),(0,100)]
-c=1
-c_2=5
+c=3
+c_2=4
 min_=min(len(testt[f"{c}"]),len(testt[f"{c_2}"]))
 start_=0
 
@@ -176,8 +176,8 @@ Line2=np.array([b[:,0],b[:,1]])
 
 ##Perform icp given the correspondences
 for _ in range(2):
-    QInd = np.arange(len(Line1[0][:20])) # are 1 to 1 correspondences for this data
-    PInd = np.arange(len(Line2[0][:20]))
+    QInd = np.arange(len(Line1[0])) # are 1 to 1 correspondences for this data
+    PInd = np.arange(len(Line2[0]))
     [Line2, E] = icp_known_corresp(Line1, Line2, QInd, PInd)
 
 # Show the adjusted positions of the lines
