@@ -2,11 +2,11 @@ import math
 import numpy as np
 
 np.set_printoptions(precision=3, suppress=True)
-A_k_minus_1 = np.array([[1.0]]) # Expresses how the state of the system [yaw] changes,identity matrix
-process_noise_v_k_minus_1 = np.array([1.0]) # noice by comands
-Q_k = np.array([[2.0]]) # 2.0 #State model noise covariance matrix Q_k,   big believe in measurment
+A_k_minus_1 = np.array([[1.]]) # Expresses how the state of the system [yaw] changes,identity matrix
+process_noise_v_k_minus_1 = np.array([0.01]) # noice by comands, big=big predict error
+Q_k = np.array([[1.0]]) # 2.0 #State model noise covariance matrix Q_k,   big believe in measurment
 H_k = np.array([[1.0]]) # predicted state estimate at time k, 0.91= is more, 1= is less(estimate positiion)
-R_k = np.array([[0.001]]) # Sensor measurement noise covariance matrix R_k
+R_k = np.array([[0.0001]]) # Sensor measurement noise covariance matrix R_k
 sensor_noise_w_k = np.array([0.01])
 
 
@@ -41,10 +41,10 @@ def ekf(z_k_observation_vector, state_estimate_k_minus_1,
 
 
 def main():
-    z_k = np.array([[0], [20],])#[30],[40],[50],[60]]) # measurments
+    z_k = np.array([[0], [20],[30],[40],[50],[60]]) # measurments
     state_estimate_k_minus_1 = np.array([math.radians(0)]) # [ radians] ,start position
     control_vector_k_minus_1 = np.array([math.radians(10)])  # [v, yaw_rate] [meters/second, radians/second]
-    P_k_minus_1 = np.array([[1.0]]) # accuracy of the state estimate at time k
+    P_k_minus_1 = np.array([[0.3]]) # accuracy of the state estimate at time k
     for k, obs_vector_z_k in enumerate(z_k, start=1):
         print(f'========= {k} =============')
         optimal_state_estimate_k, covariance_estimate_k = ekf( math.radians(obs_vector_z_k),
