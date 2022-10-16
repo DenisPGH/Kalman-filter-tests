@@ -99,7 +99,7 @@ start_x_2=0
 start_y_2=0
 current_theta=0
 
-speed_test=[[1.4,-1,1.5,-0.9],[-1,1,-1,0.9],[1,1,1,1],[1.4,1,-1.5,-0.9],[-1,1,-1,0.9],[-1,1,-1,1],[-1.4,1,-1.5,0.9],[-1,1,-1,0.9],[-1,1,-1,1]]
+speed_test=[[1.4,-1,1.5,-0.9],[-1,1,-1,0.9],[1,1,1,1],[1.4,1,-1.5,-0.9],[-1,1,-1,0.9],[-1,1,-1,1],[-1.4,1,-1.5,0.9],[-1,1,-1,0.9],[-1,1,-1,1],[1,-1,1,-1]]
 for step in range(len(speed_test)):
     """ A---B
           |
@@ -120,8 +120,8 @@ for step in range(len(speed_test)):
     start_y_2 += y_2
     if math.degrees(start_theta)>360 or math.degrees(start_theta)<-360:
         start_theta=0
-print(f'2 wheels theta= {abs(math.degrees(start_theta)):.3f}, x= {start_x:.3f} , y= {start_y:.3f}')
-print(f'4 WHEELS theta= {abs(math.degrees(start_theta_2)):.3f}, x= {start_x_2:.3f} , y= {start_y_2:.3f}')
+   # print(f'2 wheels theta= {abs(math.degrees(start_theta)):.3f}, x= {start_x:.3f} , y= {start_y:.3f}')
+    print(f'4 WHEELS theta= {abs(math.degrees(start_theta_2)):.3f}, x= {start_x_2:.3f} , y= {start_y_2:.3f}')
 
 
 # theta,x,y=odometry_distance(10,-10,start_theta)
