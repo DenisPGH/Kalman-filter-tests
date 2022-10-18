@@ -1,6 +1,8 @@
 import math
 import numpy as np
 
+from Results_robo_scans.odometry.EKF_theta_3_CLASS import EKFDeniTheta
+
 np.set_printoptions(precision=3, suppress=True)
 A_k_minus_1 = np.array([[1.]]) # Expresses how the state of the system [yaw] changes,identity matrix
 process_noise_v_k_minus_1 = np.array([0.01]) # noice by comands, big=big predict error
@@ -56,4 +58,10 @@ def main():
 
 
 if __name__=='__main__':
+    kk=EKFDeniTheta()
+    z_k = np.array([[0], [20], [30], [40], [50], [60]])
+    ende=kk.calculate_error_turning(z_k)
+    print(f" ende = {ende}")
+
+    print('JETZT HAUPT')
     main()
